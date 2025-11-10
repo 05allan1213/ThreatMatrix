@@ -13,11 +13,14 @@ type Config struct {
 
 // 数据库配置
 type DB struct {
-	DbName   string `yaml:"db_name"`
-	Host     string `yaml:"host"`
-	Port     int    `yaml:"port"`
-	User     string `yaml:"user"`
-	Password string `yaml:"password"`
+	DbName          string `yaml:"db_name"`
+	Host            string `yaml:"host"`
+	Port            int    `yaml:"port"`
+	User            string `yaml:"user"`
+	Password        string `yaml:"password"`
+	MaxIdleConns    int    `yaml:"maxIdleConns"`
+	MaxOpenConns    int    `yaml:"maxOpenConns"`
+	ConnMaxLifetime int    `yaml:"connMaxLifetime"`
 }
 
 // 日志配置
