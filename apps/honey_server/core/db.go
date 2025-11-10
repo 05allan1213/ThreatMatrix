@@ -5,6 +5,7 @@ package core
 
 import (
 	"honey_server/global"
+	"sync"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -41,4 +42,15 @@ func InitDB() (database *gorm.DB) {
 
 	logrus.Infof("数据库连接成功")
 	return
+}
+
+var db *gorm.DB
+var once sync.Once
+
+// 获取数据库连接实例（单例模式）
+func GetDB() *gorm.DB {
+	once.Do(func() {
+		db = InitDB()
+	})
+	return db
 }
