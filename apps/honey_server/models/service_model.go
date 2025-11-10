@@ -1,11 +1,11 @@
-// Package models 定义诱捕服务所使用的数据实体。
-//
-// 本文件描述诱捕服务模型及其与镜像的关联信息。
 package models
+
+// File: models/service_model.go
+// Description: 定义诱捕服务的数据模型及其与镜像、节点的关联关系。
 
 import "gorm.io/gorm"
 
-// 服务表
+// 服务模型
 type ServiceModel struct {
 	gorm.Model
 	Title        string     `json:"title"`                       // 服务名称

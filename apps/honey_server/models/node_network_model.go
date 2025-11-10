@@ -1,11 +1,11 @@
-// Package models 定义诱捕服务所使用的数据实体。
-//
-// 本文件描述节点网卡信息的模型，用于记录各接口的网络属性。
 package models
+
+// File: models/node_network_model.go
+// Description: 定义节点网卡信息的数据模型及其与节点的关联关系。
 
 import "gorm.io/gorm"
 
-// 节点网卡表
+// 节点网卡模型
 type NodeNetworkModel struct {
 	gorm.Model
 	NodeID    uint      `json:"nodeID"`                     // 关联的节点ID

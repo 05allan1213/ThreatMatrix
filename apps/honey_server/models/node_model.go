@@ -1,11 +1,11 @@
-// Package models 定义诱捕服务所使用的数据实体。
-//
-// 本文件描述节点的核心信息以及资源与系统状态的序列化结构。
 package models
+
+// File: models/node_model.go
+// Description: 定义节点信息的数据模型及其与网络、资源、系统信息的关联关系。
 
 import "gorm.io/gorm"
 
-// 节点信息
+// 节点模型
 type NodeModel struct {
 	gorm.Model
 	Title          string         `gorm:"size:32" json:"title"`                  // 节点名称

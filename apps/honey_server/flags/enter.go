@@ -1,7 +1,7 @@
-// Package flags 负责解析并调度诱捕服务的命令行标志。
-//
-// 本文件定义全局命令行参数结构并在初始化阶段完成解析。
 package flags
+
+// File: flags/enter.go
+// Description: 定义全局命令行参数结构并在初始化阶段完成解析。
 
 import (
 	"flag"

@@ -1,7 +1,7 @@
-// Package flags 负责解析并调度诱捕服务的命令行标志。
-//
-// 本文件实现 `Migrate` 命令，用于执行所有模型的表结构迁移。
 package flags
+
+// File: flags/migrate.go
+// Description: 实现 `Migrate` 命令，用于执行所有模型的表结构迁移。
 
 import (
 	"honey_server/global"

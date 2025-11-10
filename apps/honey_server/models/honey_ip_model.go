@@ -1,7 +1,7 @@
-// Package models 定义诱捕服务所使用的数据实体。
-//
-// 本文件描述诱捕 IP 的数据模型及其与节点、网络的关联关系。
 package models
+
+// File: models/honey_ip_model.go
+// Description: 定义诱捕 IP 的数据模型及其与节点、网络的关联关系。
 
 import "gorm.io/gorm"
 

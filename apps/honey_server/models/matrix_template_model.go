@@ -1,7 +1,7 @@
-// Package models 定义诱捕服务所使用的数据实体。
-//
-// 本文件描述矩阵模板及其包含的主机模板映射关系。
 package models
+
+// File: models/matrix_template_model.go
+// Description: 定义矩阵模板的数据模型及其与主机模板的关联关系。
 
 import "gorm.io/gorm"
 

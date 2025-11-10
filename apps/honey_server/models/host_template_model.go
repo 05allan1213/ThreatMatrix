@@ -1,7 +1,7 @@
-// Package models 定义诱捕服务所使用的数据实体。
-//
-// 本文件描述主机模板及其端口配置的序列化结构。
 package models
+
+// File: models/host_template_model.go
+// Description: 定义主机模板的数据模型及其与端口配置的关联关系。
 
 import "gorm.io/gorm"
 

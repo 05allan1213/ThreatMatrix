@@ -1,11 +1,11 @@
-// Package models 定义诱捕服务所使用的数据实体。
-//
-// 本文件描述节点网络配置及扫描状态的数据结构。
 package models
+
+// File: models/net_model.go
+// Description: 定义网络配置及扫描状态的数据模型及其与节点、主机的关联关系。
 
 import "gorm.io/gorm"
 
-// 网络信息
+// 网络模型
 type NetModel struct {
 	gorm.Model
 	NodeID             uint      `json:"nodeID"`                             // 关联的节点ID

@@ -1,7 +1,7 @@
-// Package core 提供诱捕服务的基础组件与核心能力。
-//
-// 本文件负责描述数据库连接配置并实现 `InitDB`，用于建立与数据库的连接及配置连接池。
 package core
+
+// File: core/db.go
+// Description: 定义数据库连接配置并实现 `InitDB`，用于建立与数据库的连接及配置连接池。
 
 import (
 	"fmt"

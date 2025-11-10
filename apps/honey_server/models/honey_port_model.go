@@ -1,7 +1,7 @@
-// Package models 定义诱捕服务所使用的数据实体。
-//
-// 本文件描述诱捕端口的数据模型及其与节点、网络、诱捕 IP 和服务的关联。
 package models
+
+// File: models/honey_port_model.go
+// Description: 定义诱捕端口的数据模型及其与节点、网络、诱捕 IP 和服务的关联。
 
 import "gorm.io/gorm"
 

@@ -1,7 +1,7 @@
-// Package models 定义诱捕服务所使用的数据实体。
-//
-// 本文件描述探测到的存活主机模型及其与节点、网络的关系。
 package models
+
+// File: models/host_model.go
+// Description: 定义探测到的存活主机模型及其与节点、网络的关系。
 
 import "gorm.io/gorm"
 

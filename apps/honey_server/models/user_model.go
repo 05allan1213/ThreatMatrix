@@ -1,8 +1,7 @@
-// Package models 定义诱捕服务所使用的数据实体。
-//
-// 本文件描述系统用户的信息结构，用于身份与权限管理。
 package models
 
+// File: models/user_model.go
+// Description: 定义系统用户的数据模型，用于身份与权限管理。
 import "gorm.io/gorm"
 
 // 用户模型
