@@ -1,3 +1,6 @@
+// Package models 定义诱捕服务所使用的数据实体。
+//
+// 本文件描述节点网卡信息的模型，用于记录各接口的网络属性。
 package models
 
 import "gorm.io/gorm"

@@ -1,3 +1,6 @@
+// Package models 定义诱捕服务所使用的数据实体。
+//
+// 本文件描述节点网络配置及扫描状态的数据结构。
 package models
 
 import "gorm.io/gorm"

@@ -1,3 +1,6 @@
+// Package models 定义诱捕服务所使用的数据实体。
+//
+// 本文件描述镜像资源的元数据结构，用于支撑服务部署。
 package models
 
 import "gorm.io/gorm"

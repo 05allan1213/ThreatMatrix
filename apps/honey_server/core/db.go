@@ -1,3 +1,6 @@
+// Package core 提供诱捕服务的基础组件与核心能力。
+//
+// 本文件负责描述数据库连接配置并实现 `InitDB`，用于建立与数据库的连接及配置连接池。
 package core
 
 import (
@@ -9,6 +12,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// 数据库配置
 type DB struct {
 	DbName   string `yaml:"db_name"`
 	Host     string `yaml:"host"`
@@ -17,6 +21,7 @@ type DB struct {
 	Password string `yaml:"password"`
 }
 
+// 初始化数据库
 func InitDB() (database *gorm.DB) {
 	var db = DB{
 		DbName:   "honey_db",
@@ -52,8 +57,8 @@ func InitDB() (database *gorm.DB) {
 		return
 	}
 	// 设置连接池
-	sqlDB.SetMaxIdleConns(10)
-	sqlDB.SetMaxOpenConns(100)
-	sqlDB.SetConnMaxLifetime(time.Hour)
+	sqlDB.SetMaxIdleConns(10)           // 设置连接池最大空闲连接数
+	sqlDB.SetMaxOpenConns(100)          // 设置连接池最大连接数
+	sqlDB.SetConnMaxLifetime(time.Hour) // 设置连接池连接最大生命周期
 	return
 }
