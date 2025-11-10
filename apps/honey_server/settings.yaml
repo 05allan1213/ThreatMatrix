@@ -1,0 +1,6 @@
+db:
+  db_name: "honey_db"
+  host: "82.157.155.26"
+  port: 3306  
+  user: "ayp"
+  password: "801026qwe"

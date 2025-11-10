@@ -1,7 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"honey_server/core"
+	"honey_server/flags"
+	"honey_server/global"
+)
 
 func main() {
-	fmt.Println("hello world")
+	global.DB = core.InitDB()
+	flags.Run()
 }
