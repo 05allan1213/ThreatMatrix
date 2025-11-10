@@ -1,15 +1,28 @@
-// Package main 提供诱捕服务的应用入口逻辑。
-//
-// 本文件负责初始化全局数据库连接并触发命令行子命令的执行。
 package main
+
+// File: main.go
+// Description: 提供诱捕服务的应用入口逻辑。
 
 import (
 	"honey_server/core"
 	"honey_server/flags"
 	"honey_server/global"
+
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	global.DB = core.InitDB()
-	flags.Run()
+	global.Config = core.ReadConfig() // 读取配置文件
+	if global.Config == nil {
+		logrus.Fatalf("配置文件读取失败")
+		return
+	} else {
+		logrus.Info(global.Config)
+	}
+	global.DB = core.InitDB() // 初始化数据库
+	if global.DB == nil {
+		logrus.Fatalf("数据库初始化失败")
+		return
+	}
+	flags.Run() // 解析命令行参数
 }
