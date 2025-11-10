@@ -55,11 +55,11 @@ func InitDB() (database *gorm.DB) {
 }
 
 var db *gorm.DB
-var once sync.Once
+var onceMysql sync.Once
 
 // 获取数据库连接实例（单例模式）
 func GetDB() *gorm.DB {
-	once.Do(func() {
+	onceMysql.Do(func() {
 		db = InitDB()
 	})
 	return db

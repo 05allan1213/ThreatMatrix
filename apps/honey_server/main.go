@@ -10,10 +10,11 @@ import (
 )
 
 func main() {
-	global.Config = core.ReadConfig() // 读取配置文件
-	global.Log = core.GetLogger()     // 初始化日志系统
-	global.DB = core.InitDB()         // 初始化数据库
-	flags.Run()                       // 解析命令行参数
+	global.Config = core.ReadConfig()    // 读取配置文件
+	global.Log = core.GetLogger()        // 初始化日志系统
+	global.DB = core.GetDB()             // 初始化数据库连接
+	global.Redis = core.GetRedisClient() // 初始化Redis连接
+	flags.Run()                          // 解析命令行参数
 	global.Log.Infof("info日志")
 	global.Log.Warnf("warn日志")
 	global.Log.Errorf("err日志")

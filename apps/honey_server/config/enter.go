@@ -5,10 +5,11 @@ package config
 
 import "fmt"
 
-// 配置结构体
+// 统一管理配置结构体
 type Config struct {
 	DB     DB     `yaml:"db"`
 	Logger Logger `yaml:"logger"`
+	Redis  Redis  `yaml:"redis"`
 }
 
 // 数据库配置
@@ -23,13 +24,6 @@ type DB struct {
 	ConnMaxLifetime int    `yaml:"connMaxLifetime"`
 }
 
-// 日志配置
-type Logger struct {
-	Format  string `yaml:"format"`
-	Level   string `yaml:"level"`
-	AppName string `yaml:"appName"`
-}
-
 // DSN 构建数据库连接字符串
 func (cfg DB) DSN() string {
 	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
@@ -39,4 +33,18 @@ func (cfg DB) DSN() string {
 		cfg.Port,
 		cfg.DbName,
 	)
+}
+
+// 日志配置
+type Logger struct {
+	Format  string `yaml:"format"`
+	Level   string `yaml:"level"`
+	AppName string `yaml:"appName"`
+}
+
+// Redis 配置
+type Redis struct {
+	Addr     string
+	Password string
+	DB       int
 }
