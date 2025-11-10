@@ -5,7 +5,10 @@ package flags
 
 import (
 	"flag"
+	"honey_server/global"
 	"os"
+
+	"github.com/sirupsen/logrus"
 )
 
 // 全局命令行参数结构
@@ -27,8 +30,15 @@ func init() {
 
 // 运行命令行参数
 func Run() {
+	// 处理命令行参数 -db
 	if Options.DB {
 		Migrate()
+		os.Exit(0)
+	}
+	// 处理命令行参数 -v
+	if Options.Version {
+		logrus.Infof("当前版本: %s  commit: %s, buildTime: %s",
+			global.Version, global.Commit, global.BuildTime)
 		os.Exit(0)
 	}
 }

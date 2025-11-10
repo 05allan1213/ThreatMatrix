@@ -5,6 +5,7 @@ package core
 
 import (
 	"honey_server/config"
+	"honey_server/flags"
 	"os"
 
 	"github.com/sirupsen/logrus"
@@ -13,7 +14,7 @@ import (
 
 // 读取配置文件
 func ReadConfig() *config.Config {
-	byteData, err := os.ReadFile("settings.yaml")
+	byteData, err := os.ReadFile(flags.Options.File)
 	if err != nil {
 		logrus.Fatalf("配置文件读取错误 %s", err)
 		return nil

@@ -16,8 +16,6 @@ func main() {
 	if global.Config == nil {
 		logrus.Fatalf("配置文件读取失败")
 		return
-	} else {
-		logrus.Info(global.Config)
 	}
 	global.DB = core.InitDB() // 初始化数据库
 	if global.DB == nil {
