@@ -6,6 +6,7 @@ package global
 import (
 	"honey_server/config"
 
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -18,4 +19,5 @@ var (
 var (
 	DB     *gorm.DB       // 数据库实例
 	Config *config.Config // 配置实例
+	Log    *logrus.Entry  // 日志实例
 )

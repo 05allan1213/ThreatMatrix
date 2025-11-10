@@ -5,8 +5,10 @@ package config
 
 import "fmt"
 
+// 配置结构体
 type Config struct {
-	DB DB `yaml:"db"`
+	DB     DB     `yaml:"db"`
+	Logger Logger `yaml:"logger"`
 }
 
 // 数据库配置
@@ -16,6 +18,13 @@ type DB struct {
 	Port     int    `yaml:"port"`
 	User     string `yaml:"user"`
 	Password string `yaml:"password"`
+}
+
+// 日志配置
+type Logger struct {
+	Format  string `yaml:"format"`
+	Level   string `yaml:"level"`
+	AppName string `yaml:"appName"`
 }
 
 // DSN 构建数据库连接字符串
