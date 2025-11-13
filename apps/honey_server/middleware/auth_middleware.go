@@ -4,6 +4,8 @@ package middleware
 // Description: 提供认证相关的中间件功能。
 
 import (
+	"honey_server/global"
+	"honey_server/utils"
 	"honey_server/utils/jwts"
 
 	"github.com/gin-gonic/gin"
@@ -11,8 +13,15 @@ import (
 
 // AuthMiddleware 通用认证中间件
 func AuthMiddleware(c *gin.Context) {
+	// 先判断这个路径在不在白名单中
+	path := c.Request.URL.Path
+	if utils.InList(global.Config.WhiteList, path) {
+		// 在白名单中，直接放行（免认证）
+		c.Next()
+		return
+	}
 	token := c.GetHeader("token") // 从请求头获取 token
-	_, err := jwts.ParseToken(token)
+	claims, err := jwts.ParseToken(token)
 	if err != nil {
 		// token 无效或解析失败
 		c.JSON(200, gin.H{
@@ -25,7 +34,13 @@ func AuthMiddleware(c *gin.Context) {
 	}
 
 	// 解析成功，继续执行下一个中间件或处理函数
+	c.Set("claims", claims) // 将解析后的用户信息存入上下文，供后续使用
 	c.Next()
+}
+
+// GetAuth 获取当前请求的用户信息
+func GetAuth(c *gin.Context) *jwts.Claims {
+	return c.MustGet("claims").(*jwts.Claims)
 }
 
 // AdminMiddleware 管理员权限中间件

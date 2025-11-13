@@ -7,11 +7,12 @@ import "fmt"
 
 // 统一管理配置结构体
 type Config struct {
-	DB     DB     `yaml:"db"`
-	Logger Logger `yaml:"logger"`
-	Redis  Redis  `yaml:"redis"`
-	System System `yaml:"system"`
-	Jwt    Jwt    `yaml:"jwt"`
+	DB        DB       `yaml:"db"`
+	Logger    Logger   `yaml:"logger"`
+	Redis     Redis    `yaml:"redis"`
+	System    System   `yaml:"system"`
+	Jwt       Jwt      `yaml:"jwt"`
+	WhiteList []string `yaml:"whiteList"`
 }
 
 // 数据库配置

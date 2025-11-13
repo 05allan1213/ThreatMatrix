@@ -26,3 +26,8 @@ jwt:
   expires: 8640000 # 过期时间，单位: 秒 (100天)
   issuer: "05allan1213" # 签发者
   secret: 5a3y2p6t3y2p # 密钥
+
+whiteList:
+  - /honey_server/login # 登录接口
+  - /honey_server/captcha # 验证码接口
+  - /honey_server/site # 站点信息接口
