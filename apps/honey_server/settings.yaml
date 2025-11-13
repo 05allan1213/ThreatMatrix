@@ -21,3 +21,8 @@ redis:
 system:
   webAddr: ":8080" # Web服务器监听地址
   mode: "debug" # 运行模式 可选值: debug, release, test
+
+jwt:
+  expires: 8640000 # 过期时间，单位: 秒 (100天)
+  issuer: "05allan1213" # 签发者
+  secret: 5a3y2p6t3y2p # 密钥
