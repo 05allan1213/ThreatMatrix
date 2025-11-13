@@ -55,7 +55,7 @@ func Run() {
 		var user User
 		switch Options.Type {
 		case "create": // 创建用户
-			user.Create()
+			user.Create(Options.Value)
 			os.Exit(0)
 		case "list": // 查看用户列表
 			user.List()
