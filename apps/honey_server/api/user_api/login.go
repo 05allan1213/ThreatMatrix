@@ -6,6 +6,7 @@ package user_api
 import (
 	"fmt"
 	"honey_server/middleware"
+	"honey_server/utils/res"
 
 	"github.com/gin-gonic/gin"
 )
@@ -27,5 +28,5 @@ func (UserApi) LoginView(c *gin.Context) {
 	cr := middleware.GetBind[LoginRequest](c)
 
 	fmt.Println(cr)
-	c.JSON(200, gin.H{"code": 0, "msg": "登录成功"})
+	res.OkWithMsg("登录成功", c)
 }

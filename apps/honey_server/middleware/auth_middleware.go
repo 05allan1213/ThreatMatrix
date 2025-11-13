@@ -7,6 +7,7 @@ import (
 	"honey_server/global"
 	"honey_server/utils"
 	"honey_server/utils/jwts"
+	"honey_server/utils/res"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,11 +25,7 @@ func AuthMiddleware(c *gin.Context) {
 	claims, err := jwts.ParseToken(token)
 	if err != nil {
 		// token 无效或解析失败
-		c.JSON(200, gin.H{
-			"code": 7,
-			"msg":  "认证失败",
-			"data": gin.H{},
-		})
+		res.FailWithMsg("认证失败", c)
 		c.Abort() // 阻止后续处理函数执行
 		return
 	}
@@ -49,22 +46,14 @@ func AdminMiddleware(c *gin.Context) {
 	claims, err := jwts.ParseToken(token)
 	if err != nil {
 		// token 无效
-		c.JSON(200, gin.H{
-			"code": 7,
-			"msg":  "认证失败",
-			"data": gin.H{},
-		})
+		res.FailWithMsg("认证失败", c)
 		c.Abort()
 		return
 	}
 
 	// 校验角色是否为管理员
 	if claims.Role != 1 {
-		c.JSON(200, gin.H{
-			"code": 7,
-			"msg":  "角色认证失败",
-			"data": gin.H{},
-		})
+		res.FailWithMsg("无权限访问", c)
 		c.Abort()
 		return
 	}
