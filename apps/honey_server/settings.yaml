@@ -17,3 +17,7 @@ redis:
   addr: 82.157.155.26:6379 # Redis地址
   password: # Redis密码
   db: 1 # Redis数据库编号
+
+system:
+  webAddr: ":8080" # Web服务器监听地址
+  mode: "release" # 运行模式 可选值: debug, release, test

@@ -1,5 +1,8 @@
 package core
 
+// File: core/redis.go
+// Description: 实现Redis初始化，用于建立与Redis服务器的连接。
+
 import (
 	"context"
 	"honey_server/global"
