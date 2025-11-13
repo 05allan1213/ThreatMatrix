@@ -12,6 +12,11 @@ import (
 
 // 迁移表结构
 func Migrate() {
+	// 检查数据库是否已初始化
+	if global.DB == nil {
+		logrus.Fatal("数据库未初始化，请检查程序执行流程")
+	}
+	
 	err := global.DB.AutoMigrate(
 		&models.HoneyIpModel{},        // 诱捕IP
 		&models.HoneyPortModel{},      // 诱捕端口
