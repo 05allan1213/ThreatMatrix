@@ -14,11 +14,12 @@ import (
 func Run() {
 	system := global.Config.System
 	gin.SetMode(system.Mode)
-	r := gin.Default()
-	g := r.Group("honey_server") // 统一路由前缀 /honey_server
-	g.Use()                      // 添加中间件
+	r := gin.Default()             // 创建默认路由
+	r.Static("uploads", "uploads") // 静态文件服务
+	g := r.Group("honey_server")   // 统一路由前缀 /honey_server
+	g.Use()                        // 添加中间件
 
-	UserRouters(g)
+	UserRouters(g) // 用户相关路由
 
 	webAddr := system.WebAddr
 	logrus.Infof("web addr run %s", webAddr)

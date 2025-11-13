@@ -20,4 +20,4 @@ redis:
 
 system:
   webAddr: ":8080" # Web服务器监听地址
-  mode: "release" # 运行模式 可选值: debug, release, test
+  mode: "debug" # 运行模式 可选值: debug, release, test
