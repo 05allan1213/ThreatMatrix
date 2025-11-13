@@ -19,13 +19,10 @@ type LoginRequest struct {
 
 // 用户登录接口
 func (UserApi) LoginView(c *gin.Context) {
-	//var cr LoginRequest
-	//err := c.ShouldBindJSON(&cr)
-	//if err != nil {
-	//	c.JSON(200, gin.H{"code": 7, "msg": "参数错误"})
-	//	return
-	//}
 	cr := middleware.GetBind[LoginRequest](c)
+	log := middleware.GetLog(c)
+	log.Infof("这是请求的内容 %v", cr)
+	log.Infof("ip %s", c.ClientIP())
 
 	fmt.Println(cr)
 	res.OkWithMsg("登录成功", c)

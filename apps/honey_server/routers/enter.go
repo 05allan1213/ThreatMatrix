@@ -15,10 +15,10 @@ import (
 func Run() {
 	system := global.Config.System
 	gin.SetMode(system.Mode)
-	r := gin.Default()               // 创建默认路由
-	r.Static("uploads", "uploads")   // 静态文件服务
-	g := r.Group("honey_server")     // 统一路由前缀 /honey_server
-	g.Use(middleware.AuthMiddleware) // 系统必须登录才能访问
+	r := gin.Default()                                         // 创建默认路由
+	r.Static("uploads", "uploads")                             // 静态文件服务
+	g := r.Group("honey_server")                               // 统一路由前缀 /honey_server
+	g.Use(middleware.LogMiddleware, middleware.AuthMiddleware) // 系统必须登录才能访问
 
 	UserRouters(g) // 用户相关路由
 
