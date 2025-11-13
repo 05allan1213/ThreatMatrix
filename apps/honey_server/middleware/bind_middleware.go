@@ -14,7 +14,7 @@ func BindJsonMiddleware[T any](c *gin.Context) {
 	var cr T
 	err := c.ShouldBindJSON(&cr)
 	if err != nil {
-		res.FailWithMsg("参数绑定错误", c)
+		res.FailWithError(err, c)
 		c.Abort()
 		return
 	}

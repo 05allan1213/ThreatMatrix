@@ -3,7 +3,11 @@ package res
 // File: utils/res/response.go
 // Description: HTTP 响应统一封装模块
 
-import "github.com/gin-gonic/gin"
+import (
+	"honey_server/utils/validate"
+
+	"github.com/gin-gonic/gin"
+)
 
 // Response 定义统一的响应结构体
 type Response struct {
@@ -53,5 +57,6 @@ func FailWithMsg(msg string, c *gin.Context) {
 
 // FailWithError 接收 error 对象并输出错误信息
 func FailWithError(err error, c *gin.Context) {
-	response(1001, nil, err.Error(), c)
+	msg := validate.ValidateError(err)
+	response(1001, nil, msg, c)
 }

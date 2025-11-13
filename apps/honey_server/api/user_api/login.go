@@ -13,8 +13,8 @@ import (
 
 // LoginRequest 登录请求参数
 type LoginRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username string `json:"username" binding:"required" label:"用户名"`
+	Password string `json:"password" binding:"required" label:"密码"`
 }
 
 // 用户登录接口
