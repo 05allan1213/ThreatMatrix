@@ -1,11 +1,14 @@
 package flags
 
+// File: flags/user.go
+// Description: 提供通过命令行创建和列出用户的功能
+
 import (
 	"encoding/json"
 	"fmt"
 	"honey_server/global"
 	"honey_server/models"
-	"honey_server/utils/pwd"
+	"honey_server/service/user_service"
 	"os"
 
 	"github.com/sirupsen/logrus"
@@ -15,18 +18,11 @@ import (
 type User struct {
 }
 
-// 用户创建请求结构体，用于接收JSON或交互式输入
-type UserInfoRequest struct {
-	Role     int8   `json:"role"`     // 用户角色：1管理员 2普通用户
-	Username string `json:"username"` // 用户名
-	Password string `json:"password"` // 密码
-}
-
 // Create 创建用户，可以通过命令行参数或交互式输入方式
 func (User) Create(value string) {
-	var userInfo UserInfoRequest
+	var userInfo user_service.UserCreateRequest
 
-	// 如果传入了 JSON 参数，则从 JSON 解析用户信息
+	// 若命令行参数中传入 JSON 字符串，则解析为用户信息
 	if value != "" {
 		err := json.Unmarshal([]byte(value), &userInfo)
 		if err != nil {
@@ -34,14 +30,15 @@ func (User) Create(value string) {
 			return
 		}
 	} else {
-		// 未传入 JSON，则使用交互式输入
+		// 否则，使用命令行交互方式创建用户
 		fmt.Println("请选择角色： 1 管理员 2 普通用户")
 		_, err := fmt.Scanln(&userInfo.Role)
 		if err != nil {
 			fmt.Println("输入错误", err)
 			return
 		}
-		// 校验角色输入是否合法
+
+		// 校验角色输入是否正确
 		if !(userInfo.Role == 1 || userInfo.Role == 2) {
 			fmt.Println("用户角色输入错误", err)
 			return
@@ -51,7 +48,7 @@ func (User) Create(value string) {
 		fmt.Println("请输入用户名")
 		fmt.Scanln(&userInfo.Username)
 
-		// 输入密码（隐藏输入）
+		// 输入密码（不回显）
 		fmt.Println("请输入密码")
 		password, err := terminal.ReadPassword(int(os.Stdin.Fd()))
 		if err != nil {
@@ -67,7 +64,7 @@ func (User) Create(value string) {
 			return
 		}
 
-		// 比对两次输入的密码是否一致
+		// 检查两次密码是否一致
 		if string(password) != string(rePassword) {
 			fmt.Println("两次密码不一致")
 			return
@@ -76,37 +73,19 @@ func (User) Create(value string) {
 		userInfo.Password = string(password)
 	}
 
-	// 检查用户名是否已存在
-	var u models.UserModel
-	err := global.DB.Take(&u, "username = ?", userInfo.Username).Error
-	if err == nil {
-		fmt.Println("用户名已存在")
-		return
-	}
-
-	// 对密码进行加密
-	hashPwd, _ := pwd.GenerateFromPassword(userInfo.Password)
-
-	// 创建用户记录
-	err = global.DB.Create(&models.UserModel{
-		Username: userInfo.Username,
-		Password: hashPwd,
-		Role:     userInfo.Role,
-	}).Error
+	// 使用 user_service 执行创建逻辑
+	us := user_service.NewUserService(global.Log)
+	_, err := us.Create(userInfo)
 	if err != nil {
-		logrus.Errorf("用户创建失败 %s", err)
-		return
+		logrus.Fatal(err)
 	}
-
-	// 输出成功信息
-	logrus.Infof("用户创建成功")
 }
 
 // List 列出最近创建的10个用户
 func (User) List() {
 	var userList []models.UserModel
 
-	// 查询最近10个用户（按创建时间倒序）
+	// 查询最近 10 个用户，按创建时间倒序排列
 	global.DB.Order("created_at desc").Limit(10).Find(&userList)
 
 	// 输出用户信息
