@@ -12,6 +12,7 @@ import (
 	"honey_server/utils/jwts"
 	"honey_server/utils/pwd"
 	"honey_server/utils/res"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -74,6 +75,9 @@ func (UserApi) LoginView(c *gin.Context) {
 		res.FailWithMsg("登录失败", c)
 		return
 	}
+
+	now := time.Now().Format(time.DateTime)
+	global.DB.Model(&user).Update("last_login_date", now) // 更新最后登录时间
 
 	// 登录成功，返回生成的 Token，并记录登录成功日志
 	loginLog.SuccessLog(user.ID, cr.Username)

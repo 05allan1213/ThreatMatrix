@@ -29,4 +29,7 @@ func UserRouters(r *gin.RouterGroup) {
 
 	// 删除用户（DELETE），绑定 JSON 请求体
 	r.DELETE("users", middleware.BindJsonMiddleware[user_api.UserRemoveRequest], app.UserRemoveView)
+
+	// 获取用户信息（GET）
+	r.GET("users/info", app.UserInfoView)
 }
