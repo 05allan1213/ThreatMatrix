@@ -3,11 +3,9 @@ package models
 // File: models/honey_port_model.go
 // Description: 定义诱捕端口的数据模型及其与节点、网络、诱捕 IP 和服务的关联。
 
-import "gorm.io/gorm"
-
 // 诱捕端口表
 type HoneyPortModel struct {
-	gorm.Model
+	Model
 	NodeID       uint         `json:"nodeID"`                        // 所属节点ID
 	NodeModel    NodeModel    `gorm:"foreignKey:NodeID" json:"-"`    // 关联节点
 	NetID        uint         `json:"netID"`                         // 所属网络ID

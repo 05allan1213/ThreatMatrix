@@ -3,11 +3,9 @@ package models
 // File: models/service_model.go
 // Description: 定义诱捕服务的数据模型及其与镜像、节点的关联关系。
 
-import "gorm.io/gorm"
-
 // 服务模型
 type ServiceModel struct {
-	gorm.Model
+	Model
 	Title        string     `json:"title"`                       // 服务名称
 	Agreement    int8       `json:"agreement"`                   // 协议
 	ImageID      uint       `json:"imageID"`                     // 镜像ID

@@ -3,11 +3,9 @@ package models
 // File: models/image_model.go
 // Description: 定义镜像资源的数据模型及其与服务的关联关系。
 
-import "gorm.io/gorm"
-
 // 镜像模型
 type ImageModel struct {
-	gorm.Model
+	Model
 	ImageName string `json:"imageName"` // 镜像名称
 	Title     string `json:"title"`     // 对外展示名称
 	Port      int    `json:"port"`      // 镜像端口
