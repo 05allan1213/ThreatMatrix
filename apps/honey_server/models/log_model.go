@@ -3,11 +3,9 @@ package models
 // File: models/log_model.go
 // Description: 定义系统日志记录的数据模型及其与用户、服务的关联关系。
 
-import "gorm.io/gorm"
-
 // 日志模型
 type LogModel struct {
-	gorm.Model
+	Model
 	Type        int8   `json:"type"`        // 日志类型
 	IP          string `json:"ip"`          // IP地址
 	Addr        string `json:"addr"`        // 地址

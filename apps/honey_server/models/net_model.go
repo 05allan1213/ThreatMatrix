@@ -3,11 +3,9 @@ package models
 // File: models/net_model.go
 // Description: 定义网络配置及扫描状态的数据模型及其与节点、主机的关联关系。
 
-import "gorm.io/gorm"
-
 // 网络模型
 type NetModel struct {
-	gorm.Model
+	Model
 	NodeID             uint      `json:"nodeID"`                             // 关联的节点ID
 	NodeModel          NodeModel `gorm:"foreignKey:NodeID" json:"-"`         // 关联的节点模型
 	Title              string    `gorm:"size:32" json:"title"`               // 网络名称

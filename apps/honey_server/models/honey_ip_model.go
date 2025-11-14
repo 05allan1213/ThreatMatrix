@@ -3,11 +3,9 @@ package models
 // File: models/honey_ip_model.go
 // Description: 定义诱捕 IP 的数据模型及其与节点、网络的关联关系。
 
-import "gorm.io/gorm"
-
 // 诱捕IP表
 type HoneyIpModel struct {
-	gorm.Model
+	Model
 	NodeID    uint      `json:"nodeID"`                     // 所属节点ID
 	NodeModel NodeModel `gorm:"foreignKey:NodeID" json:"-"` // 关联节点
 	NetID     uint      `json:"netID"`                      // 所属网络ID

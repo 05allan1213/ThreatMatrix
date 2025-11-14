@@ -3,11 +3,9 @@ package models
 // File: models/node_model.go
 // Description: 定义节点信息的数据模型及其与网络、资源、系统信息的关联关系。
 
-import "gorm.io/gorm"
-
 // 节点模型
 type NodeModel struct {
-	gorm.Model
+	Model
 	Title          string         `gorm:"size:32" json:"title"`                  // 节点名称
 	IP             string         `gorm:"size:32" json:"ip"`                     // 节点IP
 	Status         int8           `json:"status"`                                // 节点状态
