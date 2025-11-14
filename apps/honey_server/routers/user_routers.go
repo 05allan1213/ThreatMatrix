@@ -26,4 +26,7 @@ func UserRouters(r *gin.RouterGroup) {
 
 	// 用户注销（POST）
 	r.POST("logout", app.UserLogoutView)
+
+	// 删除用户（DELETE），绑定 JSON 请求体
+	r.DELETE("users", middleware.BindJsonMiddleware[user_api.UserRemoveRequest], app.UserRemoveView)
 }

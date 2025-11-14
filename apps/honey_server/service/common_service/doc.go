@@ -1,2 +1,2 @@
-// Package common_service 提供公共服务功能模块
+// Package common_service 提供通用服务模块
 package common_service
