@@ -4,10 +4,10 @@ package main
 // Description: 提供诱捕服务的应用入口逻辑。
 
 import (
-	"honey_server/core"
-	"honey_server/flags"
-	"honey_server/global"
-	"honey_server/routers"
+	"honey_server/internal/core"
+	"honey_server/internal/flags"
+	"honey_server/internal/global"
+	"honey_server/internal/routers"
 )
 
 func main() {

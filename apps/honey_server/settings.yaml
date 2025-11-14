@@ -28,6 +28,6 @@ jwt:
   secret: 5a3y2p6t3y2p # 密钥
 
 whiteList:
-  - /honey_server/login # 登录接口
-  - /honey_server/captcha # 验证码接口
-  - /honey_server/site # 站点信息接口
+  - /honey_server/internal/login # 登录接口
+  - /honey_server/internal/captcha # 验证码接口
+  - /honey_server/internal/site # 站点信息接口

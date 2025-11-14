@@ -1,0 +1,33 @@
+db:
+  db_name: "honey_db" # 数据库名
+  host: "82.157.155.26" # 数据库IP地址  
+  port: 3306  # 数据库端口
+  user: "ayp" # 数据库用户名
+  password: "801026qwe" # 数据库密码
+  maxIdleConns: 10 # 最大空闲连接数
+  maxOpenConns: 100 # 最大连接数
+  connMaxLifetime: 300 # 连接最大生命周期，单位秒
+
+logger:
+  format: json # 日志格式 可选值: text, json
+  appName: honey_server # 应用名称
+  level: info # 日志级别 可选值: debug, info, warn, error, fatal, panic
+
+redis:
+  addr: 82.157.155.26:6379 # Redis地址
+  password: # Redis密码
+  db: 1 # Redis数据库编号
+
+system:
+  webAddr: ":8080" # Web服务器监听地址
+  mode: "debug" # 运行模式 可选值: debug, release, test
+
+jwt:
+  expires: 8640000 # 过期时间，单位: 秒 (100天)
+  issuer: "05allan1213" # 签发者
+  secret: 5a3y2p6t3y2p # 密钥
+
+whiteList:
+  - /image_server/internal/login # 登录接口
+  - /image_server/internal/captcha # 验证码接口
+  - /image_server/internal/site # 站点信息接口
