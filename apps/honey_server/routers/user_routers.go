@@ -23,4 +23,7 @@ func UserRouters(r *gin.RouterGroup) {
 
 	// 用户列表查询（GET），绑定 Query 参数
 	r.GET("users", middleware.BindQueryMiddleware[user_api.UserListRequest], app.UserListView)
+
+	// 用户注销（POST）
+	r.POST("logout", app.UserLogoutView)
 }
