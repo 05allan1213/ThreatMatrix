@@ -7,6 +7,7 @@ import (
 	"honey_server/global"
 	"honey_server/middleware"
 	"honey_server/models"
+	"honey_server/service/log_service"
 	"honey_server/utils/captcha"
 	"honey_server/utils/jwts"
 	"honey_server/utils/pwd"
@@ -29,15 +30,18 @@ func (UserApi) LoginView(c *gin.Context) {
 	// 从请求中绑定并获取登录参数（如用户名、密码、验证码）
 	cr := middleware.GetBind[LoginRequest](c)
 	// log := middleware.GetLog(c) // 若需要日志可启用
+	loginLog := log_service.NewLoginLog(c) // 创建登录日志服务实例
 
 	// 校验验证码是否为空
 	if cr.CaptchaID == "" || cr.CaptchaCode == "" {
+		loginLog.FailLog(cr.Username, "", "未输入图片验证码")
 		res.FailWithMsg("请输入图片验证码", c)
 		return
 	}
 
 	// 验证图片验证码是否正确（第三个参数true表示验证后删除验证码）
 	if !captcha.CaptchaStore.Verify(cr.CaptchaID, cr.CaptchaCode, true) {
+		loginLog.FailLog(cr.Username, "", "图片验证码验证失败")
 		res.FailWithMsg("图片验证码验证失败", c)
 		return
 	}
@@ -47,12 +51,14 @@ func (UserApi) LoginView(c *gin.Context) {
 	err := global.DB.Take(&user, "username = ?", cr.Username).Error
 	if err != nil {
 		// 用户不存在或查询出错，返回错误提示
+		loginLog.FailLog(cr.Username, cr.Password, "用户名不存在")
 		res.FailWithMsg("用户名或密码错误", c)
 		return
 	}
 
 	// 校验用户密码是否匹配
 	if !pwd.CompareHashAndPassword(user.Password, cr.Password) {
+		loginLog.FailLog(cr.Username, cr.Password, "密码错误")
 		res.FailWithMsg("用户名或密码错误", c)
 		return
 	}
@@ -69,6 +75,7 @@ func (UserApi) LoginView(c *gin.Context) {
 		return
 	}
 
-	// 登录成功，返回生成的 Token
+	// 登录成功，返回生成的 Token，并记录登录成功日志
+	loginLog.SuccessLog(user.ID, cr.Username)
 	res.OkWithData(token, c)
 }
