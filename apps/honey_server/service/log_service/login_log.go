@@ -4,6 +4,7 @@ package log_service
 // Description: 用户登录日志记录服务，负责记录用户登录成功/失败日志
 
 import (
+	"honey_server/core"
 	"honey_server/global"
 	"honey_server/models"
 
@@ -19,8 +20,8 @@ type LoginLogService struct {
 // NewLoginLog 创建登录日志服务实例
 func NewLoginLog(c *gin.Context) *LoginLogService {
 	return &LoginLogService{
-		IP:   c.ClientIP(), // 获取客户端 IP
-		Addr: "",
+		IP:   c.ClientIP(),                 // 获取客户端 IP
+		Addr: core.GetIpAddr(c.ClientIP()), // 获取地址信息
 	}
 }
 
