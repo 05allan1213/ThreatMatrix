@@ -23,3 +23,8 @@ type PageInfo struct {
 	Limit int    `form:"limit"` // 每页数量
 	Key   string `form:"key"`   // 搜索关键字
 }
+
+// IDListRequest 批量操作请求结构体
+type IDListRequest struct {
+	IdList []uint `json:"idList"` // ID 列表
+}

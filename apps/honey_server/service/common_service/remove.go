@@ -12,11 +12,12 @@ import (
 
 // RemoveRequest 通用删除请求结构
 type RemoveRequest struct {
-	Debug  bool          // 是否开启 Debug 模式
-	Where  *gorm.DB      // 自定义 where 条件
-	IDList []uint        // ID 列表，用于批量删除
-	Log    *logrus.Entry // 日志记录器
-	Msg    string        // 删除对象名称，用于日志提示
+	Debug    bool          // 是否开启 Debug 模式
+	Where    *gorm.DB      // 自定义 where 条件
+	IDList   []uint        // ID 列表，用于批量删除
+	Log      *logrus.Entry // 日志记录器
+	Msg      string        // 删除对象名称，用于日志提示
+	Unscoped bool          // 是否进行硬删除
 }
 
 // Remove 通用删除方法，支持 ID 列表、条件删除、日志记录
@@ -28,6 +29,12 @@ func Remove[T any](model T, req RemoveRequest) (successCount int64, err error) {
 	if req.Debug {
 		db = db.Debug()
 		deleteDB = deleteDB.Debug()
+	}
+
+	// 启用硬删除
+	if req.Unscoped {
+		req.Log.Infof("启用真删除")
+		deleteDB = deleteDB.Unscoped()
 	}
 
 	// 添加自定义查询条件
