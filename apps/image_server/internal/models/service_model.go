@@ -10,9 +10,9 @@ type ServiceModel struct {
 	Agreement     int8       `json:"agreement"`                   // 协议
 	ImageID       uint       `json:"imageID"`                     // 镜像ID
 	ImageModel    ImageModel `gorm:"foreignKey:ImageID" json:"-"` // 关联镜像模型
-	IP            string     `json:"ip"`                          // 服务IP
-	Port          int        `json:"port"`                        // 服务端口
-	Status        int8       `json:"status"`                      // 服务状态
+	IP            string     `json:"ip"`                          // 容器IP
+	Port          int        `json:"port"`                        // 容器端口
+	Status        int8       `json:"status"`                      // 容器状态
 	HoneyIPCount  int        `json:"honeyIPCount"`                // 诱捕IP数量
 	ContainerID   string     `json:"containerID"`                 // 容器ID
 	ContainerName string     `json:"containerName"`               // 容器名称
