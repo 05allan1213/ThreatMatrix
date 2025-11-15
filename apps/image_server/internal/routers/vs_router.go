@@ -7,6 +7,7 @@ import (
 	"image_server/internal/api"
 	"image_server/internal/api/vs_api"
 	"image_server/internal/middleware"
+	"image_server/internal/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,4 +23,7 @@ func VsRouter(r *gin.RouterGroup) {
 
 	// 虚拟服务选项列表查询（GET）
 	r.GET("vs/options", app.VsOptionsListView)
+
+	// 虚拟服务删除（DELETE），绑定 JSON 请求体
+	r.DELETE("vs", middleware.BindJsonMiddleware[models.IDListRequest], app.VsRemoveView)
 }
