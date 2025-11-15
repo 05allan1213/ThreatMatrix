@@ -6,6 +6,7 @@ package global
 import (
 	"image_server/internal/config"
 
+	"github.com/docker/docker/client"
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -18,8 +19,9 @@ var (
 )
 
 var (
-	DB     *gorm.DB       // 数据库实例
-	Config *config.Config // 配置实例
-	Log    *logrus.Entry  // 日志实例
-	Redis  *redis.Client  // Redis 客户端实例
+	DB           *gorm.DB       // 数据库实例
+	Config       *config.Config // 配置实例
+	Log          *logrus.Entry  // 日志实例
+	Redis        *redis.Client  // Redis 客户端实例
+	DockerClient *client.Client // Docker 客户端实例
 )

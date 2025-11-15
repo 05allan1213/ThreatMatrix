@@ -12,7 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var client *redis.Client
+var redisclient *redis.Client
 
 // 初始化Redis连接
 func InitRedis() (client *redis.Client) {
@@ -37,7 +37,7 @@ var onceRedis sync.Once
 // 获取Redis客户端实例（单例模式）
 func GetRedisClient() *redis.Client {
 	onceRedis.Do(func() {
-		client = InitRedis()
+		redisclient = InitRedis()
 	})
-	return client
+	return redisclient
 }
