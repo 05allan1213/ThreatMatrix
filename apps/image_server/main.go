@@ -8,6 +8,7 @@ import (
 	"image_server/internal/flags"
 	"image_server/internal/global"
 	"image_server/internal/routers"
+	"image_server/internal/service/cron_service"
 )
 
 func main() {
@@ -19,5 +20,6 @@ func main() {
 	global.DB = core.GetDB()                // 初始化数据库连接
 	global.Redis = core.GetRedisClient()    // 初始化Redis连接
 	flags.Run()                             // 解析命令行参数
+	cron_service.Run()                      // 启动定时任务
 	routers.Run()                           // 启动路由服务
 }

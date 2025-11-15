@@ -13,7 +13,17 @@ type ServiceModel struct {
 	IP            string     `json:"ip"`                          // 容器IP
 	Port          int        `json:"port"`                        // 容器端口
 	Status        int8       `json:"status"`                      // 容器状态
+	ErrorMsg      string     `json:"errorMsg"`                    // 错误信息
 	HoneyIPCount  int        `json:"honeyIPCount"`                // 诱捕IP数量
 	ContainerID   string     `json:"containerID"`                 // 容器ID
 	ContainerName string     `json:"containerName"`               // 容器名称
+}
+
+// 获取服务状态
+func (s *ServiceModel) State() string {
+	switch s.Status {
+	case 1:
+		return "running"
+	}
+	return "error"
 }
