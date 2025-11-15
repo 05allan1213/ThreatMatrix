@@ -3,6 +3,7 @@ package api
 import (
 	"image_server/internal/api/mirror_cloud_api"
 	"image_server/internal/api/vs_api"
+	"image_server/internal/api/vs_net_api"
 )
 
 // File: api/enter.go
@@ -12,6 +13,7 @@ import (
 type Api struct {
 	MirrorCloudApi mirror_cloud_api.MirrorCloudApi
 	VsApi          vs_api.VsApi
+	VsNetApi       vs_net_api.VsNetApi
 }
 
 var App = Api{}

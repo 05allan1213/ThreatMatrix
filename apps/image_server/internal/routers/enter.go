@@ -22,6 +22,7 @@ func Run() {
 
 	MirrorCloudRouter(g) // 镜像云相关路由
 	VsRouter(g)          // 虚拟服务相关路由
+	VsNetRouter(g)       // 虚拟网络相关路由
 
 	webAddr := system.WebAddr
 	logrus.Infof("web addr run %s", webAddr)
