@@ -11,8 +11,7 @@ import (
 	"image_server/internal/service/docker_service"
 	"image_server/internal/utils/cmd"
 	"image_server/internal/utils/res"
-	"strconv"
-	"strings"
+	"net"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -23,70 +22,70 @@ type VsCreateRequest struct {
 	ImageID uint `json:"imageID" binding:"required"` // 指定的镜像ID
 }
 
-// 基础IP地址和子网掩码
+// 可用 IP 最大范围（支持 10.2.0.2 ~ 10.2.0.254）
 const (
-	baseIP      = "10.2.0.0" // 网络段基础地址
-	netmask     = 24         // 子网掩码
-	startIP     = 2          // 从10.2.0.2开始分配
-	maxIP       = 254        // 最大可用IP 10.2.0.254
-	reservedIPs = 1          // 预留IP数量
+	maxIP = 254 // 最大可用IP 10.2.0.254
 )
 
 // getNextAvailableIP 获取下一个可用IP地址
 // 逻辑说明：
-// 1. 查询 service 表中最大的 IP
-// 2. 如果没有记录 → 返回起始IP 10.2.0.2
-// 3. 如果有记录 → 将最后一段 +1 得到新IP
-// 4. 若超过最大范围，则返回错误
+// 1. 从配置中解析网段（如 10.2.0.0/24）
+// 2. 查询数据库中目前已分配的最大 IP
+// 3. 若无记录 → 返回网段基础地址 + 2（10.2.0.2）
+// 4. 若有记录 → 最后一段 +1
+// 5. 若超过 254 → 返回池已满错误
 func getNextAvailableIP() (string, error) {
+	// 从配置解析网段，例如 global.Config.VsNet.Net = "10.2.0.0/24"
+	ip, _, err := net.ParseCIDR(global.Config.VsNet.Net)
+	if err != nil {
+		return "", err
+	}
+	ip4 := ip.To4() // 转换为 IPv4 格式
+
 	var service models.ServiceModel
 
-	// 从数据库中查询 IP 最大的记录，用于计算下一个IP
-	err := global.DB.Order("ip DESC").First(&service).Error
+	// 查询服务表中 IP 最大的一条记录，用于推算下一个 IP
+	err = global.DB.Order("ip DESC").First(&service).Error
 	if err != nil {
-		// 数据表中还没有任何服务记录时，从起始IP分配
+		// 若数据库没有任何已使用 IP，则从网段 +2 开始分配
 		if err.Error() == "record not found" {
-			return "10.2.0.2", nil
+			ip4[3] += 2 // 10.2.0.2
+			return ip4.String(), nil
 		}
 		return "", fmt.Errorf("查询最大IP失败: %w", err)
 	}
 
-	// 将 IP 按 "." 分割为 4 段
-	ipParts := strings.Split(service.IP, ".")
-	if len(ipParts) != 4 {
-		return "", fmt.Errorf("无效的IP格式: %s", service.IP)
+	// 将数据库中存储的 IP 解析为 net.IP
+	serviceIP := net.ParseIP(service.IP)
+	if serviceIP == nil {
+		return "", fmt.Errorf("服务ip解析错误")
 	}
+	serviceIP4 := serviceIP.To4()
 
-	// 获取最后一段并递增
-	lastOctet, err := strconv.Atoi(ipParts[3])
-	if err != nil {
-		return "", fmt.Errorf("解析IP最后一段失败: %s", service.IP)
-	}
-
-	// 检查可用范围
-	if lastOctet >= maxIP {
+	// 检查是否超过最大分配范围
+	if serviceIP4[3] >= maxIP {
 		return "", fmt.Errorf("IP地址池已满")
 	}
 
-	// 构造新的IP地址
-	newLastOctet := lastOctet + 1
-	newIP := fmt.Sprintf("10.2.0.%d", newLastOctet)
-	return newIP, nil
+	// 正常分配：在当前最大 IP 的最后一段 +1
+	newLastOctet := serviceIP4[3] + 1
+	ip4[3] = newLastOctet
+	return ip4.String(), nil
 }
 
-// VsCreateView 虚拟服务创建接口
-// 实现步骤：
-// 1. 校验镜像是否存在且可用
-// 2. 确保 docker 网络已创建
-// 3. 校验该镜像是否已运行服务（防重复）
-// 4. 分配新的IP地址
-// 5. 调用 docker_service 启动容器
-// 6. 将服务记录写入数据库
+// VsCreateView 创建虚拟服务接口
+// 详细流程：
+// 1. 校验镜像 ID 是否存在、镜像状态是否可用
+// 2. 确保 docker network 存在（没有则创建）
+// 3. 检查该镜像是否已经运行过一个虚拟服务（防止重复创建）
+// 4. 分配一个可用的 IP 地址
+// 5. 通过 docker_service.RunContainer 运行容器
+// 6. 将容器信息写入数据库 ServiceModel
 func (VsApi) VsCreateView(c *gin.Context) {
-	// 解析并绑定请求体
+	// 参数绑定与校验
 	cr := middleware.GetBind[VsCreateRequest](c)
 
-	// 根据 ImageID 查询镜像记录
+	// 查询镜像信息
 	var image models.ImageModel
 	err := global.DB.Take(&image, cr.ImageID).Error
 	if err != nil {
@@ -94,14 +93,13 @@ func (VsApi) VsCreateView(c *gin.Context) {
 		return
 	}
 
-	// 镜像状态为 2 表示不可用
+	// 判断镜像状态是否不可用
 	if image.Status == 2 {
 		res.FailWithMsg("镜像不可用", c)
 		return
 	}
 
-	// 确保 docker 网络存在
-	// 如果网络 honey-hy 不存在，则创建；存在则忽略错误
+	// 创建 docker 网络（若已存在则忽略）
 	networkCommand := "docker network create --driver bridge --subnet 10.2.0.0/24 honey-hy >/dev/null 2>&1 || true"
 	err = cmd.Cmd(networkCommand)
 	if err != nil {
@@ -110,7 +108,7 @@ func (VsApi) VsCreateView(c *gin.Context) {
 		return
 	}
 
-	// 判断此镜像是否已经创建过服务，避免重复创建
+	// 判断该镜像是否已经运行容器（一个镜像只能创建一个虚拟服务）
 	var service models.ServiceModel
 	err = global.DB.Take(&service, "image_id = ?", cr.ImageID).Error
 	if err == nil {
@@ -118,7 +116,7 @@ func (VsApi) VsCreateView(c *gin.Context) {
 		return
 	}
 
-	// 获取新的可分配IP
+	// 分配下一可用 IP
 	ip, err := getNextAvailableIP()
 	if err != nil {
 		logrus.Errorf("获取可用IP失败: %s", err)
@@ -126,13 +124,13 @@ func (VsApi) VsCreateView(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(ip)
+	fmt.Println(ip) // 打印调试信息
 
-	// 构建容器名称（加上 hy_ 前缀）
-	networkName := "honey-hy"
-	containerName := "hy_" + image.ImageName
+	// 读取 docker 网络名称、容器前缀（来自配置）
+	networkName := global.Config.VsNet.Name
+	containerName := global.Config.VsNet.Prefix + image.ImageName
 
-	// 使用 docker_service.RunContainer 封装方法运行容器
+	// 实际启动容器
 	containerID, err := docker_service.RunContainer(
 		containerName,
 		networkName,
@@ -145,26 +143,26 @@ func (VsApi) VsCreateView(c *gin.Context) {
 		return
 	}
 
-	// 打印实际执行的 Docker 命令（用于调试）
+	// 输出用于调试的命令（实际执行 run 的是 RunContainer）
 	command := fmt.Sprintf(
-		"docker run -d --network honey-hy --ip %s --name %s %s:%s",
-		ip, image.ImageName, image.ImageName, image.Tag,
+		"docker run -d --network %s --ip %s --name %s %s:%s",
+		networkName, ip, containerName, image.ImageName, image.Tag,
 	)
 	fmt.Println(command)
 
-	// 组装 ServiceModel 记录
+	// 组装数据库记录
 	var model = models.ServiceModel{
-		Title:         image.Title,     // 服务名称
+		Title:         image.Title,     // 服务标题
 		ContainerName: containerName,   // 容器名称
-		Agreement:     image.Agreement, // 协议类型（例如 http/https）
-		ImageID:       image.ID,        // 镜像ID
-		IP:            ip,              // 分配的IP
-		Port:          image.Port,      // 服务端口
-		Status:        1,               // 状态：1-运行中
-		ContainerID:   containerID,     // Docker容器ID
+		Agreement:     image.Agreement, // 协议类型（HTTP/HTTPS 等）
+		ImageID:       image.ID,        // 镜像 ID
+		IP:            ip,              // 分配 IP
+		Port:          image.Port,      // 端口
+		Status:        1,               // 状态 1=运行中
+		ContainerID:   containerID,     // Docker 返回的容器 ID
 	}
 
-	// 将新服务写入数据库
+	// 写入数据库
 	err = global.DB.Create(&model).Error
 	if err != nil {
 		logrus.Errorf("创建虚拟服务失败 %s", err)

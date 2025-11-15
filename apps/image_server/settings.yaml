@@ -31,3 +31,8 @@ whiteList:
   - /image_server/internal/login # 登录接口
   - /image_server/internal/captcha # 验证码接口
   - /image_server/internal/site # 站点信息接口
+
+vsNet:
+  name: honey-hy # 虚拟网络名称
+  prefix: hy- # 虚拟网络前缀
+  net: 10.2.0.0/24 # 虚拟网络地址段
