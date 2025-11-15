@@ -26,4 +26,7 @@ func HostTemplateRouter(r *gin.RouterGroup) {
 
 	// 主机模板删除（DELETE），绑定 JSON 请求体
 	r.DELETE("host_template", middleware.BindJsonMiddleware[models.IDListRequest], app.Remove)
+
+	// 主机模板更新（PUT），绑定 JSON 请求体
+	r.PUT("host_template", middleware.BindJsonMiddleware[host_template_api.UpdateRequest], app.UpdateView)
 }
