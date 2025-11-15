@@ -9,6 +9,7 @@ import (
 	"image_server/internal/global"
 	"image_server/internal/routers"
 	"image_server/internal/service/cron_service"
+	"image_server/internal/service/vs_net_service"
 )
 
 func main() {
@@ -21,5 +22,6 @@ func main() {
 	global.Redis = core.GetRedisClient()    // 初始化Redis连接
 	flags.Run()                             // 解析命令行参数
 	cron_service.Run()                      // 启动定时任务
+	vs_net_service.Run()                    // 启动虚拟网络服务
 	routers.Run()                           // 启动路由服务
 }
