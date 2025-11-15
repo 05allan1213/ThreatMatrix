@@ -20,4 +20,7 @@ func HostTemplateRouter(r *gin.RouterGroup) {
 
 	// 主机模板列表查询（GET），绑定 Query 参数
 	r.GET("host_template", middleware.BindQueryMiddleware[models.PageInfo], app.ListView)
+
+	// 主机模板选项列表查询（GET）
+	r.GET("host_template/options", app.OptionsView)
 }
