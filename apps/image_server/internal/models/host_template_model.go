@@ -14,6 +14,6 @@ type HostTemplatePortList []HostTemplatePort
 
 // 主机模板端口列表
 type HostTemplatePort struct {
-	Port      int  `json:"port"`      // 端口号
-	ServiceID uint `json:"serviceID"` // 关联服务ID
+	Port      int  `json:"port" binding:"min=1,max=65535"` // 端口号
+	ServiceID uint `json:"serviceID" binding:"required"`   // 关联服务ID
 }
