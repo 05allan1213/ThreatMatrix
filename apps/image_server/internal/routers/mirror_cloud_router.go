@@ -1,10 +1,12 @@
 package routers
 
 // File: routers/mirror_cloud_router.go
-// Description: 镜像云模块路由注册，负责绑定镜像查看相关接口
+// Description: 镜像云模块路由注册
 
 import (
 	"image_server/internal/api"
+	"image_server/internal/api/mirror_cloud_api"
+	"image_server/internal/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,6 +15,9 @@ import (
 func MirrorCloudRouter(r *gin.RouterGroup) {
 	app := api.App.MirrorCloudApi // 获取镜像云 API 实例
 
-	// 镜像文件查看接口
+	// 镜像文件查看（POST）
 	r.POST("mirror_cloud/see", app.ImageSeeView)
+
+	// 镜像创建（POST），绑定 JSON 请求体
+	r.POST("mirror_cloud", middleware.BindJsonMiddleware[mirror_cloud_api.ImageCreateRequest], app.ImageCreateView)
 }

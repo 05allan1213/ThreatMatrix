@@ -66,6 +66,7 @@ coverage.out
 # 临时文件或数据
 *.local
 *.cache
+*.tar.gz
 
 # -----------------------------
 # 7. Docker / 部署相关
