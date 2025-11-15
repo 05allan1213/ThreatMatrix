@@ -7,6 +7,7 @@ import (
 	"image_server/internal/api"
 	"image_server/internal/api/mirror_cloud_api"
 	"image_server/internal/middleware"
+	"image_server/internal/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,4 +24,7 @@ func MirrorCloudRouter(r *gin.RouterGroup) {
 
 	// 镜像列表查询（GET），绑定 Query 参数
 	r.GET("mirror_cloud", middleware.BindQueryMiddleware[mirror_cloud_api.ImageListRequest], app.ImageListView)
+
+	// 镜像详情查询（GET），绑定 URI 参数
+	r.GET("mirror_cloud/:id", middleware.BindUriMiddleware[models.IDRequest], app.ImageDetailView)
 }
