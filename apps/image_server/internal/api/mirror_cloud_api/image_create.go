@@ -21,13 +21,13 @@ import (
 
 // ImageCreateRequest 请求结构体，用于接收镜像创建所需的各项参数
 type ImageCreateRequest struct {
-	ImageID   string `json:"imageID" binding:"required"`   // 镜像ID
-	ImageName string `json:"imageName" binding:"required"` // 镜像名称
-	ImageTag  string `json:"imageTag" binding:"required"`  // 镜像Tag
-	ImagePath string `json:"imagePath" binding:"required"` // 镜像上传的路径
-	Title     string `json:"title" binding:"required"`     // 镜像别名
-	Port      int    `json:"port" binding:"required"`      // 镜像端口
-	Agreement int8   `json:"agreement" binding:"required"` // 镜像的协议
+	ImageID   string `json:"imageID" binding:"required"`              // 镜像id
+	ImageName string `json:"imageName" binding:"required"`            // 镜像的名称
+	ImageTag  string `json:"imageTag" binding:"required"`             // 镜像的tag
+	ImagePath string `json:"imagePath" binding:"required"`            // 镜像上传的路径
+	Title     string `json:"title" binding:"required"`                // 镜像别名
+	Port      int    `json:"port" binding:"required,min=1,max=65535"` // 镜像端口
+	Agreement int8   `json:"agreement" binding:"required,oneof=1"`    // 镜像的协议
 }
 
 // ImageCreateView 镜像创建接口，实现镜像导入、校验、移动文件、数据入库等功能

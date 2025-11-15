@@ -27,4 +27,7 @@ func MirrorCloudRouter(r *gin.RouterGroup) {
 
 	// 镜像详情查询（GET），绑定 URI 参数
 	r.GET("mirror_cloud/:id", middleware.BindUriMiddleware[models.IDRequest], app.ImageDetailView)
+
+	// 镜像更新（PUT），绑定 JSON 请求体
+	r.PUT("mirror_cloud", middleware.BindJsonMiddleware[mirror_cloud_api.ImageUpdateRequest], app.ImageUpdateView)
 }
