@@ -30,4 +30,7 @@ func MirrorCloudRouter(r *gin.RouterGroup) {
 
 	// 镜像更新（PUT），绑定 JSON 请求体
 	r.PUT("mirror_cloud", middleware.BindJsonMiddleware[mirror_cloud_api.ImageUpdateRequest], app.ImageUpdateView)
+
+	// 镜像删除（DELETE），绑定 URI 参数
+	r.DELETE("mirror_cloud/:id", middleware.BindUriMiddleware[models.IDRequest], app.ImageRemoveView)
 }
