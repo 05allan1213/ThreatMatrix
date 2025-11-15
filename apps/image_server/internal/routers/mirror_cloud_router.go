@@ -33,4 +33,7 @@ func MirrorCloudRouter(r *gin.RouterGroup) {
 
 	// 镜像删除（DELETE），绑定 URI 参数
 	r.DELETE("mirror_cloud/:id", middleware.BindUriMiddleware[models.IDRequest], app.ImageRemoveView)
+
+	// 镜像选项列表查询（GET）
+	r.GET("mirror_cloud/options", app.ImageOptionsListView)
 }
