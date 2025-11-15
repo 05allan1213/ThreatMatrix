@@ -21,6 +21,7 @@ func Run() {
 	g.Use(middleware.LogMiddleware, middleware.AuthMiddleware) // 系统必须登录才能访问，所有以 /honey_server 开头的路由默认都需要认证
 
 	MirrorCloudRouter(g) // 镜像云相关路由
+	VsRouter(g)          // 虚拟服务相关路由
 
 	webAddr := system.WebAddr
 	logrus.Infof("web addr run %s", webAddr)
