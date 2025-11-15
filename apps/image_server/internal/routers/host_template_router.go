@@ -23,4 +23,7 @@ func HostTemplateRouter(r *gin.RouterGroup) {
 
 	// 主机模板选项列表查询（GET）
 	r.GET("host_template/options", app.OptionsView)
+
+	// 主机模板删除（DELETE），绑定 JSON 请求体
+	r.DELETE("host_template", middleware.BindJsonMiddleware[models.IDListRequest], app.Remove)
 }
