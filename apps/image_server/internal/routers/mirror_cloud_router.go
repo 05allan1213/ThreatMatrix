@@ -20,4 +20,7 @@ func MirrorCloudRouter(r *gin.RouterGroup) {
 
 	// 镜像创建（POST），绑定 JSON 请求体
 	r.POST("mirror_cloud", middleware.BindJsonMiddleware[mirror_cloud_api.ImageCreateRequest], app.ImageCreateView)
+
+	// 镜像列表查询（GET），绑定 Query 参数
+	r.GET("mirror_cloud", middleware.BindQueryMiddleware[mirror_cloud_api.ImageListRequest], app.ImageListView)
 }
