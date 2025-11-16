@@ -13,9 +13,9 @@ import (
 )
 
 var (
-	Version   = "v1.0.1"              // 版本号
-	Commit    = "56a9c63f"            // 提交ID
-	BuildTime = "2025-11-10 17:12:34" // 构建时间
+	Version   = "v1.0.1"             // 版本号
+	Commit    = "5dd146421917"       // 提交ID
+	BuildTime = "2025-11-16 9:45:25" // 构建时间
 )
 
 var (
