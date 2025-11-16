@@ -26,4 +26,7 @@ func NodeRouters(r *gin.RouterGroup) {
 
 	// 节点选项（GET）
 	r.GET("node/options", app.OptionsView)
+
+	// 节点删除（DELETE），绑定 URI 参数
+	r.DELETE("node/:id", middleware.BindUriMiddleware[models.IDRequest], app.RemoveView)
 }
