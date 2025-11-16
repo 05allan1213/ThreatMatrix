@@ -12,5 +12,5 @@ type NodeNetworkModel struct {
 	IP        string    `gorm:"size:32" json:"ip"`          // 探针IP
 	Mask      string    `gorm:"size:32" json:"mask"`        // 子网掩码 8-32
 	Gateway   string    `gorm:"size:32" json:"gateway"`     // 网关
-	Status    int8      `json:"status"`                     // 网关状态
+	Status    int8      `json:"status"`                     // 网关状态 1 启用 2 未启用
 }

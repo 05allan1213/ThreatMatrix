@@ -60,6 +60,19 @@ func register() (err error) {
 	if err != nil {
 		return
 	}
+	var networkList []*node_rpc.NetworkInfoMessage
+	_networkList, err := info.GetNetworkList("hy-")
+	if err != nil {
+		return
+	}
+	for _, networkInfo := range _networkList {
+		networkList = append(networkList, &node_rpc.NetworkInfoMessage{
+			Network: networkInfo.Network,
+			Ip:      networkInfo.Ip,
+			Net:     networkInfo.Net,
+			Mask:    int32(networkInfo.Mask),
+		})
+	}
 
 	// 构建节点注册请求
 	req := node_rpc.RegisterRequest{
@@ -75,6 +88,7 @@ func register() (err error) {
 			SystemType:          systemInfo.Architecture, // 系统架构
 			StartTime:           systemInfo.BootTime,     // 系统启动时间
 		},
+		NetworkList: networkList,
 	}
 
 	// 通过grpc客户端发送注册请求

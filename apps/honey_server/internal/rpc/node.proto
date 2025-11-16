@@ -27,6 +27,7 @@ message RegisterRequest {
   string Commit = 5;
   systemInfoMessage systemInfo = 6;
   resourceMessage resourceInfo = 7;
+  repeated networkInfoMessage networkList = 8;
 }
 
 // 定义节点资源检测请求结构体
@@ -54,6 +55,14 @@ message resourceMessage {
   float  diskUseRate = 6;
   string nodePath = 7;
   int64  nodeResourceOccupancy = 8;
+}
+
+// 网卡信息结构体
+message networkInfoMessage {
+  string network = 1;
+  string ip = 2;
+  string net = 3;
+  int32 mask = 4;
 }
 
 // protoc --go_out=. --go-grpc_out=. *.proto

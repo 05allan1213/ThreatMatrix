@@ -33,8 +33,8 @@ func GetNetworkList(filterNetworkName string) (list []NetworkInfo, err error) {
 			continue
 		}
 
-		// 过滤掉名称以指定后缀结尾的网卡（如诱捕相关网卡）
-		if strings.HasSuffix(faceName, filterNetworkName) {
+		// 过滤掉名称以指定前缀的网卡（如诱捕相关网卡）
+		if strings.HasPrefix(faceName, filterNetworkName) {
 			continue
 		}
 
