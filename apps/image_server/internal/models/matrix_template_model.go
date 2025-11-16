@@ -14,6 +14,6 @@ type HostTemplateList []HostTemplateInfo
 
 // 主机模板信息
 type HostTemplateInfo struct {
-	HostTemplateID uint `json:"hostTemplateID"` // 主机模板ID
-	Weight         int  `json:"weight"`         // 权重
+	HostTemplateID uint `json:"hostTemplateID" binding:"required"`       // 主机模板ID
+	Weight         int  `json:"weight" binding:"required,min=1,max=100"` // 权重
 }

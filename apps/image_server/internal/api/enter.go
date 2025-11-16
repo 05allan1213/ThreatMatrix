@@ -2,6 +2,7 @@ package api
 
 import (
 	"image_server/internal/api/host_template_api"
+	"image_server/internal/api/matrix_template_api"
 	"image_server/internal/api/mirror_cloud_api"
 	"image_server/internal/api/vs_api"
 	"image_server/internal/api/vs_net_api"
@@ -12,10 +13,11 @@ import (
 
 // Api 结构体包含各个子模块的API实例。
 type Api struct {
-	MirrorCloudApi  mirror_cloud_api.MirrorCloudApi
-	VsApi           vs_api.VsApi
-	VsNetApi        vs_net_api.VsNetApi
-	HostTemplateApi host_template_api.HostTemplateApi
+	MirrorCloudApi    mirror_cloud_api.MirrorCloudApi
+	VsApi             vs_api.VsApi
+	VsNetApi          vs_net_api.VsNetApi
+	HostTemplateApi   host_template_api.HostTemplateApi
+	MatrixTemplateApi matrix_template_api.MatrixTemplateApi
 }
 
 var App = Api{}

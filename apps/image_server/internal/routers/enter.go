@@ -20,10 +20,11 @@ func Run() {
 	g := r.Group("image_server")                               // 统一路由前缀 /honey_server
 	g.Use(middleware.LogMiddleware, middleware.AuthMiddleware) // 系统必须登录才能访问，所有以 /honey_server 开头的路由默认都需要认证
 
-	MirrorCloudRouter(g)  // 镜像云相关路由
-	VsRouter(g)           // 虚拟服务相关路由
-	VsNetRouter(g)        // 虚拟网络相关路由
-	HostTemplateRouter(g) // 主机模板相关路由
+	MirrorCloudRouter(g)    // 镜像云相关路由
+	VsRouter(g)             // 虚拟服务相关路由
+	VsNetRouter(g)          // 虚拟网络相关路由
+	HostTemplateRouter(g)   // 主机模板相关路由
+	MatrixTemplateRouter(g) // 矩阵模板相关路由
 
 	webAddr := system.WebAddr
 	logrus.Infof("web addr run %s", webAddr)
