@@ -21,6 +21,7 @@ require (
 )
 
 require (
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/shirou/gopsutil/v4 v4.25.10
 	golang.org/x/net v0.42.0 // indirect
 	golang.org/x/sys v0.37.0 // indirect

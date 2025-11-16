@@ -9,6 +9,7 @@ import (
 	"honey_node/internal/global"
 	"os"
 
+	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )
@@ -26,7 +27,16 @@ func ReadConfig() *config.Config {
 		logrus.Fatalf("配置文件配置错误 %s", err)
 		return nil
 	}
+	SetDefault(c)
 	return c
+}
+
+// 配置文件默认值
+func SetDefault(c *config.Config) {
+	if c.System.Uid == "" {
+		c.System.Uid = uuid.New().String()
+		SetConfig()
+	}
 }
 
 // 更新配置文件
