@@ -23,6 +23,7 @@ func Run() {
 	UserRouters(g)    // 用户相关路由
 	CaptchaRouters(g) // 图片验证码路由
 	LogRouters(g)     // 日志相关路由
+	NodeRouters(g)    // 节点相关路由
 
 	webAddr := system.WebAddr
 	logrus.Infof("web addr run %s", webAddr)

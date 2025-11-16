@@ -34,6 +34,18 @@ func BindQueryMiddleware[T any](c *gin.Context) {
 	c.Set("request", cr)
 }
 
+// BindUriMiddleware 通用 Uri 绑定中间件
+func BindUriMiddleware[T any](c *gin.Context) {
+	var cr T
+	err := c.ShouldBindUri(&cr)
+	if err != nil {
+		res.FailWithMsg("参数绑定错误", c)
+		c.Abort()
+		return
+	}
+	c.Set("request", cr)
+}
+
 // GetBind 获取绑定参数的通用方法
 func GetBind[T any](c *gin.Context) (cr T) {
 	return c.MustGet("request").(T)

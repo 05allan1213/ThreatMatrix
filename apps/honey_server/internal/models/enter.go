@@ -28,3 +28,8 @@ type PageInfo struct {
 type IDListRequest struct {
 	IdList []uint `json:"idList"` // ID 列表
 }
+
+// IDRequest 单个操作请求结构体
+type IDRequest struct {
+	Id []uint `json:"id" uri:"id" form:"id"` // ID
+}
