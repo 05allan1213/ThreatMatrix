@@ -10,6 +10,8 @@ service NodeService {
   rpc Register (RegisterRequest) returns (BaseResponse) {}
   // 节点资源检测
   rpc NodeResource (NodeResourceRequest) returns (BaseResponse) {}
+  // 管理下发命令到节点运行
+  rpc Command (stream CmdResponse) returns (stream CmdRequest) {}
 }
 
 // 定义响应结构体
@@ -63,6 +65,64 @@ message networkInfoMessage {
   string ip = 2;
   string net = 3;
   int32 mask = 4;
+}
+
+// 命令类型枚举
+enum CmdType {
+  cmdNetworkFlushType = 0;
+  cmdNetScanType = 1;
+  cmdNodeRemoveType = 2;
+}
+
+// 命令请求结构体
+message CmdRequest {
+  CmdType cmdType = 1;
+  string taskID = 2;
+  NetworkFlushInMessage NetworkFlushInMessage = 3;
+  NetScanInMessage NetScanInMessage = 4;
+  NodeRemoveInMessage NodeRemoveInMessage = 5;
+}
+
+// 网络刷新请求消息
+message NetworkFlushInMessage {
+  repeated string filterNetworkName = 1;
+}
+
+// 网络扫描请求消息
+message NetScanInMessage {
+
+}
+
+// 节点移除请求消息
+message NodeRemoveInMessage {
+
+}
+
+// 网卡刷新响应消息
+message NetworkFlushOutMessage {
+  repeated networkInfoMessage networkList = 1;
+}
+
+// 网卡扫描响应消息
+message NetScanOutMessage {
+
+}
+
+// 节点移除响应消息
+message NodeRemoveOutMessage {
+
+}
+
+// 命令响应结构体
+message CmdResponse {
+  CmdType cmdType = 1;
+  string taskID = 2;
+  string nodeID = 3;
+  int32 code = 4;
+  string errorMsg = 5;
+  NetworkFlushOutMessage NetworkFlushOutMessage = 6;
+  NetScanOutMessage NetScanOutMessage = 7;
+  NodeRemoveOutMessage NodeRemoveOutMessage = 8;
 }
 
 // protoc --go_out=. --go-grpc_out=. *.proto

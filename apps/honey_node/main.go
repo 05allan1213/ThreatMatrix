@@ -5,12 +5,14 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"honey_node/internal/core"
 	"honey_node/internal/global"
 	"honey_node/internal/rpc/node_rpc"
 	"honey_node/internal/service/cron_service"
 	"honey_node/internal/utils/info"
 	"honey_node/internal/utils/ip"
+	"io"
 	"os"
 
 	"github.com/sirupsen/logrus"
@@ -34,11 +36,67 @@ func main() {
 	}
 	logrus.Infof("节点注册成功")
 
+	go command()
+
 	// 启动定时任务调度器
 	cron_service.Run()
 
 	// 阻塞当前goroutine，防止程序退出
 	select {}
+}
+
+var CmdResponseChan = make(chan *node_rpc.CmdResponse)
+
+func command() {
+	stream, err := global.GrpcClient.Command(context.Background())
+	if err != nil {
+		logrus.Errorf("节点Command失败 %s", err)
+		return
+	}
+	go func() {
+		for {
+			request, err := stream.Recv()
+			if err == io.EOF {
+				logrus.Infof("节点断开")
+				return
+			}
+			if err != nil {
+				logrus.Infof("节点出错 %s", err)
+				return
+			}
+			fmt.Println("接收管理的数据", request)
+			switch request.CmdType {
+			case node_rpc.CmdType_cmdNetworkFlushType:
+				fmt.Println("网卡刷新")
+				_networkList, _ := info.GetNetworkList(request.NetworkFlushInMessage.FilterNetworkName[0])
+				var networkList []*node_rpc.NetworkInfoMessage
+				for _, networkInfo := range _networkList {
+					networkList = append(networkList, &node_rpc.NetworkInfoMessage{
+						Network: networkInfo.Network,
+						Ip:      networkInfo.Ip,
+						Net:     networkInfo.Net,
+						Mask:    int32(networkInfo.Mask),
+					})
+				}
+				CmdResponseChan <- &node_rpc.CmdResponse{
+					CmdType: node_rpc.CmdType_cmdNetworkFlushType,
+					TaskID:  "xx",
+					NodeID:  global.Config.System.Uid,
+					NetworkFlushOutMessage: &node_rpc.NetworkFlushOutMessage{
+						NetworkList: networkList,
+					},
+				}
+			}
+		}
+	}()
+
+	for response := range CmdResponseChan {
+		err := stream.Send(response)
+		if err != nil {
+			logrus.Infof("数据发送失败 %s", err)
+			continue
+		}
+	}
 }
 
 // 节点注册函数
