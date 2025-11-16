@@ -6,13 +6,15 @@ package models
 // 节点模型
 type NodeModel struct {
 	Model
-	Title          string         `gorm:"size:32" json:"title"`                  // 节点名称
-	IP             string         `gorm:"size:32" json:"ip"`                     // 节点IP
-	Status         int8           `json:"status"`                                // 节点状态
-	NetCount       int            `json:"netCount"`                              // 节点网络接口数量
-	HoneyIPCount   int            `json:"honeyIPCount"`                          // 节点诱捕IP数量
-	Resource       NodeResource   `gorm:"serializer:json" json:"resource"`       // 节点资源信息
-	NodeSystemInfo NodeSystemInfo `gorm:"serializer:json" json:"nodeSystemInfo"` // 节点系统信息
+	Title        string         `gorm:"size:32" json:"title"`              // 节点名称
+	Uid          string         `gorm:"size:64" json:"uid"`                // 节点UID
+	IP           string         `gorm:"size:32" json:"ip"`                 // 节点IP
+	Mac          string         `gorm:"size:64" json:"mac"`                // 节点MAC
+	Status       int8           `json:"status"`                            // 节点状态
+	NetCount     int            `json:"netCount"`                          // 节点网络接口数量
+	HoneyIPCount int            `json:"honeyIPCount"`                      // 节点诱捕IP数量
+	Resource     NodeResource   `gorm:"serializer:json" json:"resource"`   // 节点资源信息
+	SystemInfo   NodeSystemInfo `gorm:"serializer:json" json:"systemInfo"` // 节点系统信息
 }
 
 // 节点资源信息
@@ -34,4 +36,6 @@ type NodeSystemInfo struct {
 	CoreVersion         string `json:"coreVersion"`         // 内核版本
 	SystemType          string `json:"systemType"`          // 系统类型
 	StartTime           string `json:"startTime"`           // 启动时间
+	NodeVersion         string `json:"nodeVersion"`         // 节点版本
+	NodeCommit          string `json:"nodeCommit"`          // 节点提交
 }

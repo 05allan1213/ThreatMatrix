@@ -23,6 +23,29 @@ message RegisterRequest {
   string node_uid = 3;
   string version = 4;
   string Commit = 5;
+  systemInfoMessage systemInfo = 6;
+  resourceMessage resourceInfo = 7;
+}
+
+// 定义系统信息结构体
+message systemInfoMessage {
+  string  hostName = 1;
+  string distributionVersion = 2;
+  string coreVersion = 3;
+  string systemType = 4;
+  string startTime = 5;
+}
+
+// 节点资源信息结构体
+message resourceMessage {
+  int64 cpuCount = 1;
+  float cpuUseRate = 2;
+  int64 memTotal = 3;
+  float  memUseRate = 4;
+  int64 diskTotal = 5;
+  float  diskUseRate = 6;
+  string nodePath = 7;
+  int64  nodeResourceOccupancy = 8;
 }
 
 // protoc --go_out=. --go-grpc_out=. *.proto

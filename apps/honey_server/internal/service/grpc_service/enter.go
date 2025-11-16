@@ -4,8 +4,6 @@ package grpc_service
 // Description: gRPC服务，负责启动gRPC服务器，注册节点服务处理器，处理节点注册等gRPC请求。
 
 import (
-	"context"
-	"fmt"
 	"honey_server/internal/global"
 	"honey_server/internal/rpc/node_rpc"
 	"net"
@@ -18,13 +16,6 @@ import (
 // 实现了node_rpc.NodeServiceServer接口，用于处理节点相关的gRPC请求
 type NodeService struct {
 	node_rpc.UnimplementedNodeServiceServer
-}
-
-// Register 处理节点注册请求的gRPC方法
-func (NodeService) Register(ctx context.Context, request *node_rpc.RegisterRequest) (pd *node_rpc.BaseResponse, err error) {
-	pd = new(node_rpc.BaseResponse)
-	fmt.Println("节点注册", request)
-	return
 }
 
 // Run 启动gRPC服务的入口函数
