@@ -79,7 +79,7 @@ func main() {
 		fmt.Printf("获取当前工作目录失败: %v\n", err)
 		return
 	}
-	
+
 	message, err := GetResourceInfo(nodePath)
 	if err != nil {
 		fmt.Printf("获取资源信息失败: %v\n", err)
@@ -93,5 +93,5 @@ func main() {
 	fmt.Printf("磁盘总量: %d bytes\n", message.DiskTotal)
 	fmt.Printf("磁盘使用率: %.2f%%\n", message.DiskUseRate)
 	fmt.Printf("节点路径: %s\n", message.NodePath)
-	fmt.Printf("节点资源占用率: %d bytes\n", message.NodeResourceOccupancy)
+	fmt.Printf("节点资源磁盘占用: %d bytes\n", message.NodeResourceOccupancy)
 }

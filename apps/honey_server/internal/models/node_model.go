@@ -31,7 +31,7 @@ type NodeResource struct {
 
 // 节点系统信息
 type NodeSystemInfo struct {
-	Hostname            string `json:"hostname"`            // 主机名称
+	HostName            string `json:"hostname"`            // 主机名称
 	DistributionVersion string `json:"distributionVersion"` // 发行版本
 	CoreVersion         string `json:"coreVersion"`         // 内核版本
 	SystemType          string `json:"systemType"`          // 系统类型

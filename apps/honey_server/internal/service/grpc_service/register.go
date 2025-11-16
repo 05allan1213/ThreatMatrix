@@ -33,8 +33,13 @@ func (NodeService) Register(ctx context.Context, request *node_rpc.RegisterReque
 			Mac:    request.Mac,                 // 节点MAC地址
 			Status: 1,                           // 节点状态：正常（1）
 			SystemInfo: models.NodeSystemInfo{
-				NodeVersion: request.Version, // 节点版本号
-				NodeCommit:  request.Commit,  // 节点提交哈希
+				NodeVersion:         request.Version,                        // 节点版本号
+				NodeCommit:          request.Commit,                         // 节点提交哈希
+				HostName:            request.SystemInfo.HostName,            // 节点主机名
+				DistributionVersion: request.SystemInfo.DistributionVersion, // 节点发行版版本号
+				CoreVersion:         request.SystemInfo.CoreVersion,         // 节点内核版本号
+				SystemType:          request.SystemInfo.SystemType,          // 节点系统类型
+				StartTime:           request.SystemInfo.StartTime,           // 节点启动时间
 			},
 		}
 

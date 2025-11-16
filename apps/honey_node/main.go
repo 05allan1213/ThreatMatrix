@@ -86,6 +86,8 @@ func main() {
 		logrus.Fatalln(err)
 	}
 
+	systemInfo, err := info.GetSystemInfo()
+
 	// 发送节点注册请求到gRPC服务器
 	_, err = client.Register(context.Background(), &node_rpc.RegisterRequest{
 		Ip:      _ip,
@@ -94,7 +96,11 @@ func main() {
 		Version: global.Version,
 		Commit:  global.Commit,
 		SystemInfo: &node_rpc.SystemInfoMessage{
-			HostName: hostname,
+			HostName:            hostname,
+			DistributionVersion: systemInfo.OSVersion,
+			CoreVersion:         systemInfo.Kernel,
+			SystemType:          systemInfo.Architecture,
+			StartTime:           systemInfo.BootTime,
 		},
 	})
 	if err != nil {
