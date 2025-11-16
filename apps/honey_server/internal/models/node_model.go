@@ -19,14 +19,14 @@ type NodeModel struct {
 
 // 节点资源信息
 type NodeResource struct {
-	CpuCount           int     `json:"cpuCount"`           // CPU核心数
-	CpuUseRate         float64 `json:"cpuUseRate"`         // CPU使用率
-	MemTotal           int64   `json:"memTotal"`           // 内存总量
-	MemUseRate         float64 `json:"memUseRate"`         // 内存使用率
-	DiskTotal          int64   `json:"diskTotal"`          // 磁盘总量
-	DiskUseRate        float64 `json:"diskUseRate"`        // 磁盘使用率
-	NodePath           string  `json:"nodePath"`           // 节点的部署目录
-	NodeResourceOccupy int64   `json:"nodeResourceOccupy"` // 节点目录的资源占用
+	CpuCount              int     `json:"cpuCount"`             // CPU核心数
+	CpuUseRate            float64 `json:"cpuUseRate"`           // CPU使用率
+	MemTotal              int64   `json:"memTotal"`             // 内存总量
+	MemUseRate            float64 `json:"memUseRate"`           // 内存使用率
+	DiskTotal             int64   `json:"diskTotal"`            // 磁盘总量
+	DiskUseRate           float64 `json:"diskUseRate"`          // 磁盘使用率
+	NodePath              string  `json:"nodePath"`             // 节点的部署目录
+	NodeResourceOccupancy int64   `json:"nodeResourceOccupany"` // 节点资源磁盘占用
 }
 
 // 节点系统信息

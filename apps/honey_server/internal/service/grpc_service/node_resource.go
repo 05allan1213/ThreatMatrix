@@ -31,14 +31,14 @@ func (NodeService) NodeResource(ctx context.Context, request *node_rpc.NodeResou
 	// 构建需要更新的节点资源信息（仅包含资源相关字段）
 	newModel := models.NodeModel{
 		Resource: models.NodeResource{
-			CpuCount:           int(request.ResourceInfo.CpuCount),         // CPU核心数
-			CpuUseRate:         float64(request.ResourceInfo.CpuUseRate),   // CPU使用率
-			MemTotal:           request.ResourceInfo.MemTotal,              // 总内存
-			MemUseRate:         float64(request.ResourceInfo.MemUseRate),   // 内存使用率
-			DiskTotal:          request.ResourceInfo.DiskTotal,             // 总磁盘空间
-			DiskUseRate:        float64(request.ResourceInfo.DiskUseRate),  // 磁盘使用率
-			NodePath:           request.ResourceInfo.NodePath,              // 节点路径
-			NodeResourceOccupy: request.ResourceInfo.NodeResourceOccupancy, // 节点资源占用率
+			CpuCount:              int(request.ResourceInfo.CpuCount),         // CPU核心数
+			CpuUseRate:            float64(request.ResourceInfo.CpuUseRate),   // CPU使用率
+			MemTotal:              request.ResourceInfo.MemTotal,              // 总内存
+			MemUseRate:            float64(request.ResourceInfo.MemUseRate),   // 内存使用率
+			DiskTotal:             request.ResourceInfo.DiskTotal,             // 总磁盘空间
+			DiskUseRate:           float64(request.ResourceInfo.DiskUseRate),  // 磁盘使用率
+			NodePath:              request.ResourceInfo.NodePath,              // 节点路径
+			NodeResourceOccupancy: request.ResourceInfo.NodeResourceOccupancy, // 节点资源占用率
 		},
 	}
 

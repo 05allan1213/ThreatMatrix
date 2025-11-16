@@ -11,6 +11,7 @@ import (
 	"honey_node/internal/core"
 	"honey_node/internal/global"
 	"honey_node/internal/rpc/node_rpc"
+	"honey_node/internal/utils/info"
 	"honey_node/internal/utils/ip"
 	"io/ioutil"
 	"os"
@@ -86,7 +87,7 @@ func main() {
 	}
 
 	// 发送节点注册请求到gRPC服务器
-	result, err := client.Register(context.Background(), &node_rpc.RegisterRequest{
+	_, err = client.Register(context.Background(), &node_rpc.RegisterRequest{
 		Ip:      _ip,
 		Mac:     mac,
 		NodeUid: global.Config.System.Uid,
@@ -96,7 +97,34 @@ func main() {
 			HostName: hostname,
 		},
 	})
+	if err != nil {
+		logrus.Fatalf("节点注册失败 %s", err)
+		return
+	}
 
-	// 打印注册结果和可能的错误
-	fmt.Println(result, err)
+	nodePath, _ := os.Getwd()
+	fmt.Println(nodePath)
+	resourceInfo, err := info.GetResourceInfo(nodePath)
+	if err != nil {
+		logrus.Fatalf("节点资源信息获取失败 %s", err)
+		return
+	}
+
+	_, err = client.NodeResource(context.Background(), &node_rpc.NodeResourceRequest{
+		NodeUid: global.Config.System.Uid,
+		ResourceInfo: &node_rpc.ResourceMessage{
+			CpuCount:              resourceInfo.CpuCount,
+			CpuUseRate:            resourceInfo.CpuUseRate,
+			MemTotal:              resourceInfo.MemTotal,
+			MemUseRate:            resourceInfo.MemUseRate,
+			DiskTotal:             resourceInfo.DiskTotal,
+			DiskUseRate:           resourceInfo.DiskUseRate,
+			NodePath:              resourceInfo.NodePath,
+			NodeResourceOccupancy: resourceInfo.NodeResourceOccupancy,
+		},
+	})
+	if err != nil {
+		logrus.Fatalf("节点资源信息上报失败 %s", err)
+		return
+	}
 }
