@@ -54,8 +54,9 @@ type Redis struct {
 
 // 系统配置
 type System struct {
-	WebAddr string `yaml:"webAddr"`
-	Mode    string `yaml:"mode"`
+	WebAddr  string `yaml:"webAddr"`
+	GrpcAddr string `yaml:"grpcAddr"`
+	Mode     string `yaml:"mode"`
 }
 
 // Jwt 配置

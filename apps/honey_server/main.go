@@ -8,6 +8,7 @@ import (
 	"honey_server/internal/flags"
 	"honey_server/internal/global"
 	"honey_server/internal/routers"
+	"honey_server/internal/service/grpc_service"
 )
 
 func main() {
@@ -17,6 +18,7 @@ func main() {
 	global.Log = core.GetLogger()        // 初始化日志系统
 	global.DB = core.GetDB()             // 初始化数据库连接
 	global.Redis = core.GetRedisClient() // 初始化Redis连接
+	go grpc_service.Run()                // 启动gRPC服务
 	flags.Run()                          // 解析命令行参数
 	routers.Run()                        // 启动路由服务
 }

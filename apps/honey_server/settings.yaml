@@ -19,7 +19,8 @@ redis:
   db: 1 # Redis数据库编号
 
 system:
-  webAddr: ":8080" # Web服务器监听地址
+  webAddr: ":8000" # Web服务器监听地址
+  grpcAddr: ":8081" # gRPC服务器监听地址
   mode: "debug" # 运行模式 可选值: debug, release, test
 
 jwt:
