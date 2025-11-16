@@ -5,6 +5,7 @@ package grpc_service
 
 import (
 	"context"
+	"fmt"
 	"honey_server/internal/global"
 	"honey_server/internal/rpc/node_rpc"
 	"net"
@@ -22,6 +23,7 @@ type NodeService struct {
 // Register 处理节点注册请求的gRPC方法
 func (NodeService) Register(ctx context.Context, request *node_rpc.RegisterRequest) (pd *node_rpc.BaseResponse, err error) {
 	pd = new(node_rpc.BaseResponse)
+	fmt.Println("节点注册", request)
 	return
 }
 

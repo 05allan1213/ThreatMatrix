@@ -1,0 +1,7 @@
+logger:
+  format: json # 日志格式 可选值: text, json
+  appName: honey_node # 应用名称
+  level: info # 日志级别 可选值: debug, info, warn, error, fatal, panic
+
+system:
+  grpcManageAddr: "82.157.155.26:8081" # gRPC管理地址
