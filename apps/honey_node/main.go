@@ -9,7 +9,10 @@ import (
 	"honey_node/internal/core"
 	"honey_node/internal/global"
 	"honey_node/internal/rpc/node_rpc"
+	"honey_node/internal/utils/ip"
+	"os"
 
+	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -38,13 +41,34 @@ func main() {
 	// 初始化节点服务的gRPC客户端实例
 	client := node_rpc.NewNodeServiceClient(conn)
 
+	// 获取节点的IP地址和MAC地址
+	_ip, mac, err := ip.GetNetworkInfo(global.Config.System.Network)
+	if err != nil {
+		logrus.Fatalln(err)
+	}
+
+	// 如果节点的UID为空，则生成一个新的UID并保存到配置文件中
+	if global.Config.System.Uid == "" {
+		global.Config.System.Uid = uuid.New().String()
+		core.SetConfig()
+	}
+
+	// 获取主机名
+	hostname, err := os.Hostname()
+	if err != nil {
+		logrus.Fatalln(err)
+	}
+
 	// 发送节点注册请求到gRPC服务器
 	result, err := client.Register(context.Background(), &node_rpc.RegisterRequest{
-		Ip:      "",    // 节点IP
-		Mac:     "xx",  // 节点MAC地址
-		NodeUid: "xxx", // 节点唯一标识
-		Version: "",    // 节点版本号
-		Commit:  "",    // 代码提交哈希
+		Ip:      _ip,
+		Mac:     mac,
+		NodeUid: global.Config.System.Uid,
+		Version: global.Version,
+		Commit:  global.Commit,
+		SystemInfo: &node_rpc.SystemInfoMessage{
+			HostName: hostname,
+		},
 	})
 
 	// 打印注册结果和可能的错误
