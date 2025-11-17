@@ -5,6 +5,7 @@ package routers
 
 import (
 	"honey_server/internal/api"
+	"honey_server/internal/api/node_network_api"
 	"honey_server/internal/middleware"
 	"honey_server/internal/models"
 
@@ -17,4 +18,10 @@ func NodeNetworkRouters(r *gin.RouterGroup) {
 
 	// 节点网卡刷新（GET），绑定 Query 参数
 	r.GET("node_network/flush", middleware.BindQueryMiddleware[models.IDRequest], app.FlushView)
+
+	// 节点网卡列表（GET），绑定 Query 参数
+	r.GET("node_network", middleware.BindQueryMiddleware[node_network_api.ListRequest], app.ListView)
+
+	// 节点网卡更新（PUT），绑定 JSON 参数
+	r.PUT("node_network", middleware.BindJsonMiddleware[node_network_api.UpdateRequest], app.UpdateView)
 }
