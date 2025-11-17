@@ -5,6 +5,9 @@ package node_network_api
 
 import (
 	"fmt"
+	"honey_server/internal/global"
+	"honey_server/internal/middleware"
+	"honey_server/internal/models"
 	"honey_server/internal/rpc/node_rpc"
 	"honey_server/internal/service/grpc_service"
 	"honey_server/internal/utils/res"
@@ -15,6 +18,25 @@ import (
 
 // 处理节点网卡信息刷新的API方法
 func (NodeNetworkApi) FlushView(c *gin.Context) {
+	cr := middleware.GetBind[models.IDRequest](c)
+	var model models.NodeModel
+	err := global.DB.Take(&model, cr.Id).Error
+	if err != nil {
+		res.FailWithMsg("节点不存在", c)
+		return
+	}
+
+	if model.Status != 1 {
+		res.FailWithMsg("节点未运行", c)
+		return
+	}
+
+	// 判断节点在不在
+	_, ok := grpc_service.StreamMap[model.Uid]
+	if !ok {
+		res.FailWithMsg("节点离线中", c)
+		return
+	}
 	// 向grpc命令请求通道发送网卡刷新指令
 	grpc_service.CmdRequestChan <- &node_rpc.CmdRequest{
 		CmdType: node_rpc.CmdType_cmdNetworkFlushType,
