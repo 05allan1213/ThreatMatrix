@@ -5,6 +5,7 @@ package command
 
 import (
 	"fmt"
+	"honey_node/internal/core"
 	"honey_node/internal/rpc/node_rpc"
 	"honey_node/internal/utils/ip"
 	"net"
@@ -94,8 +95,14 @@ func (nc *NodeClient) CmdNetScan(request *node_rpc.CmdRequest) {
 				return
 			}
 
+			// 查询MAC地址对应的厂商信息
+			manuf, found := core.ManufQuery(mac.String())
+			if !found {
+				manuf = "Unknown" // 或者其他默认值
+			}
+
 			// 打印扫描结果
-			fmt.Printf("%s %s %.2f\n", ip, mac, progress)
+			fmt.Printf("%s %s %s %.2f\n", ip, mac, manuf, progress)
 
 			// 发送中间结果响应：包含当前IP、MAC、进度
 			nc.cmdResponseChan <- &node_rpc.CmdResponse{
@@ -108,6 +115,7 @@ func (nc *NodeClient) CmdNetScan(request *node_rpc.CmdRequest) {
 					NetID:    req.NetID,         // 关联网络ID
 					Ip:       ip,                // 扫描到的IP
 					Mac:      mac.String(),      // 对应的MAC地址
+					Manuf:    manuf,             // 对应的厂商信息
 				},
 			}
 		}(ipStr)
