@@ -101,7 +101,7 @@ func (VsApi) VsCreateView(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(ip) // 打印分配的IP（调试用）
+	fmt.Println(ip) // 打印分配的IP
 
 	// 运行容器（基于镜像信息、网络配置、分配的IP）
 	networkName := global.Config.VsNet.Name                       // 网络名称（从配置获取）

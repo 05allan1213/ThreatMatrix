@@ -21,6 +21,7 @@ require (
 )
 
 require (
+	github.com/j-keck/arping v1.0.3
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/shirou/gopsutil/v4 v4.25.10
 	golang.org/x/net v0.42.0 // indirect
