@@ -90,7 +90,10 @@ message NetworkFlushInMessage {
 
 // 网络扫描请求消息
 message NetScanInMessage {
-
+  string network = 1; //使用哪一个网卡进行arp探测
+  string ipRange = 2; // 需要扫描的ip列表
+  repeated string filterIPList = 3; // 不需要扫描的ip列表
+  uint32 netID = 4; // 网络id
 }
 
 // 节点移除请求消息
@@ -105,7 +108,11 @@ message NetworkFlushOutMessage {
 
 // 网卡扫描响应消息
 message NetScanOutMessage {
-
+  bool end = 1; // 是否结束
+  float progress = 2; // 扫描进度
+  string ip = 3; // ip
+  string mac = 4; // mac地址
+  string manuf = 5;// mac对应的厂商
 }
 
 // 节点移除响应消息
