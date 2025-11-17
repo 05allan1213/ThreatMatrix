@@ -24,4 +24,11 @@ func NodeNetworkRouters(r *gin.RouterGroup) {
 
 	// 节点网卡更新（PUT），绑定 JSON 参数
 	r.PUT("node_network", middleware.BindJsonMiddleware[node_network_api.UpdateRequest], app.UpdateView)
+
+	// 节点网卡启用（PUT），绑定 JSON 参数
+	r.PUT("node_network/enable", middleware.BindJsonMiddleware[models.IDRequest], app.EnableView)
+
+	// 节点网卡删除（DELETE），绑定 Uri 参数
+	r.DELETE("node_network/:id", middleware.BindUriMiddleware[models.IDRequest], app.RemoveView)
+
 }

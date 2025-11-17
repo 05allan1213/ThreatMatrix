@@ -11,7 +11,7 @@ type NetModel struct {
 	Title              string    `gorm:"size:32" json:"title"`               // 网络名称
 	Network            string    `gorm:"size:32" json:"network"`             // 网卡名称
 	IP                 string    `gorm:"size:32" json:"ip"`                  // 探针IP
-	Mask               string    `json:"mask"`                               // 子网掩码 8-32
+	Mask               int8      `json:"mask"`                               // 子网掩码 8-32
 	Gateway            string    `gorm:"size:32" json:"gateway"`             // 网关
 	HostCount          int       `json:"hostCount"`                          // 子网中活跃的主机数量(存活资产)
 	HoneyIpCount       int       `json:"honeyIpCount"`                       // 诱捕IP数量
