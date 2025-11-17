@@ -8,6 +8,7 @@ import (
 	"honey_server/internal/rpc/node_rpc"
 	"honey_server/internal/service/grpc_service"
 	"honey_server/internal/utils/res"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,10 +24,15 @@ func (NodeNetworkApi) FlushView(c *gin.Context) {
 		},
 	}
 
-	// 从grpc命令响应通道接收刷新结果
-	response := <-grpc_service.CmdResponseChan
-	fmt.Println("网卡刷新数据", response)
-
-	// 返回成功响应，包含网卡刷新结果数据
-	res.OkWithData(response.NetworkFlushOutMessage, c)
+	// 从grpc命令响应通道接收刷新结果，增加超时机制
+	select {
+	case response := <-grpc_service.CmdResponseChan:
+		fmt.Println("网卡刷新数据", response)
+		// 返回成功响应，包含网卡刷新结果数据
+		res.OkWithData(response.NetworkFlushOutMessage, c)
+	case <-time.After(30 * time.Second):
+		// 超时处理
+		fmt.Println("网卡刷新指令执行超时")
+		res.FailWithMsg("节点响应超时", c)
+	}
 }
