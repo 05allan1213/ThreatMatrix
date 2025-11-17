@@ -25,6 +25,7 @@ func Run() {
 	LogRouters(g)         // 日志相关路由
 	NodeRouters(g)        // 节点相关路由
 	NodeNetworkRouters(g) // 节点网卡相关路由
+	NetRouters(g)         // 网络相关路由
 
 	webAddr := system.WebAddr
 	logrus.Infof("web addr run %s", webAddr)
