@@ -16,6 +16,7 @@ import (
 	"os"
 
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/metadata"
 )
 
 func main() {
@@ -48,7 +49,8 @@ func main() {
 var CmdResponseChan = make(chan *node_rpc.CmdResponse)
 
 func command() {
-	stream, err := global.GrpcClient.Command(context.Background())
+	ctx := metadata.NewOutgoingContext(context.Background(), metadata.Pairs("nodeID", global.Config.System.Uid))
+	stream, err := global.GrpcClient.Command(ctx)
 	if err != nil {
 		logrus.Errorf("节点Command失败 %s", err)
 		return
