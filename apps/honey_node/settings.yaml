@@ -7,3 +7,8 @@ system:
   grpcManageAddr: "82.157.155.26:8081" # gRPC管理地址
   network: eth0 # 主网卡名
   uid: 28b603b8-1561-4b6b-914f-09df0b600089
+
+filterNetworkList: # 过滤网卡
+  - br-
+  - docker
+  - mc_

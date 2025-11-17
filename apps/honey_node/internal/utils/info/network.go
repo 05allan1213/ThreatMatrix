@@ -17,7 +17,7 @@ type NetworkInfo struct {
 }
 
 // GetNetworkList 获取网卡信息列表
-func GetNetworkList(filterNetworkName string) (list []NetworkInfo, err error) {
+func GetNetworkList(filterNetworkList []string) (list []NetworkInfo, err error) {
 	// 获取系统所有网卡
 	faces, err := net.Interfaces()
 	if err != nil {
@@ -34,7 +34,15 @@ func GetNetworkList(filterNetworkName string) (list []NetworkInfo, err error) {
 		}
 
 		// 过滤掉名称以指定前缀的网卡（如诱捕相关网卡）
-		if strings.HasPrefix(faceName, filterNetworkName) {
+		var isFilter bool
+		for _, s := range filterNetworkList {
+			// 过滤掉诱捕ip的网卡
+			if strings.HasPrefix(faceName, s) {
+				isFilter = true
+				break
+			}
+		}
+		if isFilter {
 			continue
 		}
 

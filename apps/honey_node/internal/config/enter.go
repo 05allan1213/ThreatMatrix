@@ -5,8 +5,9 @@ package config
 
 // 统一管理配置结构体
 type Config struct {
-	Logger Logger `yaml:"logger"`
-	System System `yaml:"system"`
+	Logger            Logger   `yaml:"logger"`
+	System            System   `yaml:"system"`
+	FilterNetworkList []string `yaml:"filterNetworkList"`
 }
 
 // 日志配置

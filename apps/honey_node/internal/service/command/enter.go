@@ -70,8 +70,8 @@ func (nc *NodeClient) Register() error {
 		return fmt.Errorf("获取系统信息失败: %v", err)
 	}
 
-	// 获取节点网卡列表（过滤"hy-"前缀的网卡）
-	networkList, err := nc.getNetworkList("hy-")
+	// 获取节点网卡列表（过滤指定前缀的网卡）
+	networkList, err := nc.getNetworkList(nc.config.FilterNetworkList)
 	if err != nil {
 		return fmt.Errorf("获取网络列表失败: %v", err)
 	}
@@ -261,14 +261,14 @@ func (nc *NodeClient) handleCommand(request *node_rpc.CmdRequest) {
 	case node_rpc.CmdType_cmdNetworkFlushType:
 		logrus.Info("处理网卡刷新命令")
 
-		// 提取命令中的过滤条件（默认空字符串）
-		filter := ""
+		// 提取命令中的过滤条件
+		var filters []string
 		if request.NetworkFlushInMessage != nil && len(request.NetworkFlushInMessage.FilterNetworkName) > 0 {
-			filter = request.NetworkFlushInMessage.FilterNetworkName[0]
+			filters = request.NetworkFlushInMessage.FilterNetworkName
 		}
 
 		// 获取过滤后的网卡列表
-		networkList, err := nc.getNetworkList(filter)
+		networkList, err := nc.getNetworkList(filters)
 		if err != nil {
 			logrus.Errorf("获取网络列表失败: %v", err)
 			return
@@ -299,9 +299,9 @@ func (nc *NodeClient) handleCommand(request *node_rpc.CmdRequest) {
 }
 
 // 获取网络列表并转换为grpc消息格式
-func (nc *NodeClient) getNetworkList(filter string) ([]*node_rpc.NetworkInfoMessage, error) {
+func (nc *NodeClient) getNetworkList(filters []string) ([]*node_rpc.NetworkInfoMessage, error) {
 	// 获取过滤后的网络接口信息
-	_networkList, err := info.GetNetworkList(filter)
+	_networkList, err := info.GetNetworkList(filters)
 	if err != nil {
 		return nil, err
 	}

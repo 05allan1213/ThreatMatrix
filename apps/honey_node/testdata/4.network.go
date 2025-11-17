@@ -1,7 +1,7 @@
 package main
 
 // File: testdata/4.network.go
-// Description: 获取网卡列表
+// Description: 获取指定网卡列表
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	networkList, err := info.GetNetworkList("hy-")
+	networkList, err := info.GetNetworkList([]string{"br-", "vir", "mc_", "docker"})
 	if err != nil {
 		fmt.Println(err)
 		return
