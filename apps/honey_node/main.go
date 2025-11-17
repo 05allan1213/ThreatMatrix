@@ -1,7 +1,8 @@
 package main
 
 // File: main.go
-// Description: grpc客户端主程序
+// Description: grpc节点程序主入口
+
 import (
 	"context"
 	"fmt"
@@ -13,7 +14,6 @@ import (
 	"honey_node/internal/utils/ip"
 	"io"
 	"os"
-	"sync"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -27,10 +27,10 @@ func main() {
 	core.SetLogDefault()
 	// 获取日志实例
 	global.Log = core.GetLogger()
-	// 初始化grpc客户端
+	// 初始化grpc客户端（连接管理服务）
 	global.GrpcClient = core.GetGrpcClient()
 
-	// 执行节点注册
+	// 执行节点注册流程
 	err := register()
 	if err != nil {
 		logrus.Errorf("节点注册失败 %s", err)
@@ -41,44 +41,25 @@ func main() {
 	// 启动命令交互协程（处理与管理服务的双向流通信）
 	go command()
 
-	// 启动定时任务调度器（如资源上报等）
+	// 启动定时任务调度器
 	cron_service.Run()
 
-	// 阻塞当前goroutine，防止程序退出
+	// 阻塞当前goroutine，保持程序运行
 	select {}
 }
 
 // CmdResponseChan 命令响应通道
 // 用于缓存需要发送给管理服务的命令执行结果，由命令处理逻辑写入，发送协程读取并通过grpc流发送
-var CmdResponseChan = make(chan *node_rpc.CmdResponse, 100) // 添加缓冲，避免阻塞
+var CmdResponseChan = make(chan *node_rpc.CmdResponse)
 
-// Stream grpc命令流客户端
+// Stream grpc命令流客户端实例
 // 用于与管理服务建立双向流连接，发送命令响应和接收管理服务的命令
 var Stream node_rpc.NodeService_CommandClient
 
-// done channel用于控制goroutine退出
-var done = make(chan struct{})
-var mu sync.Mutex
-var isReconnecting = false
-
 // command 处理与管理服务的grpc双向流命令交互
-// 功能：建立命令流连接，启动响应发送协程，循环接收管理服务的命令并处理，处理后通过响应通道返回结果，断开连接时自动重连
+// 功能：建立命令流连接，启动响应发送协程，循环接收管理服务命令并处理，处理结果通过响应通道返回；连接断开时自动重连
 func command() {
-	mu.Lock()
-	if isReconnecting {
-		mu.Unlock()
-		return
-	}
-	isReconnecting = true
-	mu.Unlock()
-
-	defer func() {
-		mu.Lock()
-		isReconnecting = false
-		mu.Unlock()
-	}()
-
-	// 创建包含节点UID的上下文（用于grpc身份标识）
+	// 创建包含节点唯一标识（UID）的上下文（用于grpc身份验证）
 	ctx := metadata.NewOutgoingContext(context.Background(), metadata.Pairs("nodeID", global.Config.System.Uid))
 
 	// 建立与管理服务的命令流连接
@@ -86,39 +67,31 @@ func command() {
 	Stream, err = global.GrpcClient.Command(ctx)
 	if err != nil {
 		logrus.Errorf("节点Command流连接失败 %s", err)
-		// 连接失败后等待一段时间再重连
-		time.Sleep(5 * time.Second)
-		go command()
+		// 连接失败后等待2秒重试
+		time.Sleep(2 * time.Second)
+		command()
 		return
 	}
 
-	// 创建一个新的done channel
-	close(done) // 关闭之前的done channel以通知之前的goroutine退出
-	done = make(chan struct{})
-
 	// 启动协程：从响应通道读取结果并通过grpc流发送给管理服务
 	go func() {
-		for {
-			select {
-			case response := <-CmdResponseChan:
-				err := Stream.Send(response)
-				if err != nil {
-					logrus.Infof("命令响应发送失败 %s", err)
-					return // 发送失败时退出goroutine
-				}
-			case <-done:
-				// 收到退出信号，退出goroutine
-				return
+		for response := range CmdResponseChan {
+			err := Stream.Send(response)
+			if err != nil {
+				logrus.Infof("命令响应发送失败 %s", err)
+				continue
 			}
 		}
 	}()
+
+	fmt.Println("节点成功连接到管理服务的Command流")
 
 	// 循环接收管理服务发送的命令
 	for {
 		request, err := Stream.Recv()
 		if err == io.EOF {
-			// 流结束（管理服务断开）
-			logrus.Infof("与管理服务的命令流断开")
+			// 流结束（管理服务断开连接）
+			logrus.Infof("与管理服务的Command流断开（EOF）")
 			break
 		}
 		if err != nil {
@@ -128,7 +101,7 @@ func command() {
 		}
 
 		// 打印接收的命令
-		fmt.Println("接收管理服务的命令", request)
+		fmt.Println("接收管理服务的命令数据", request)
 
 		// 根据命令类型处理不同逻辑
 		switch request.CmdType {
@@ -143,33 +116,28 @@ func command() {
 			var networkList []*node_rpc.NetworkInfoMessage
 			for _, networkInfo := range _networkList {
 				networkList = append(networkList, &node_rpc.NetworkInfoMessage{
-					Network: networkInfo.Network,
-					Ip:      networkInfo.Ip,
-					Net:     networkInfo.Net,
-					Mask:    int32(networkInfo.Mask),
+					Network: networkInfo.Network,     // 网卡名称
+					Ip:      networkInfo.Ip,          // 网卡IP地址
+					Net:     networkInfo.Net,         // 网络地址（CIDR格式）
+					Mask:    int32(networkInfo.Mask), // 子网掩码长度
 				})
 			}
 
-			// 将刷新结果写入响应通道，由发送协程发送给管理服务
-			// 使用select避免阻塞
-			select {
-			case CmdResponseChan <- &node_rpc.CmdResponse{
-				CmdType: node_rpc.CmdType_cmdNetworkFlushType,
-				TaskID:  "xx",
-				NodeID:  global.Config.System.Uid,
+			// 构建命令响应并写入响应通道（使用原请求的TaskID保持关联）
+			CmdResponseChan <- &node_rpc.CmdResponse{
+				CmdType: node_rpc.CmdType_cmdNetworkFlushType, // 响应命令类型（与请求一致）
+				TaskID:  request.TaskID,                       // 任务ID（与请求一致，用于关联命令和结果）
+				NodeID:  global.Config.System.Uid,             // 节点唯一标识
 				NetworkFlushOutMessage: &node_rpc.NetworkFlushOutMessage{
-					NetworkList: networkList,
+					NetworkList: networkList, // 刷新后的网卡列表
 				},
-			}:
-			default:
-				logrus.Warn("命令响应通道已满，丢弃响应")
 			}
 		}
 	}
 
-	// 命令流断开后，等待一段时间自动重连
-	time.Sleep(5 * time.Second)
-	go command()
+	// 连接断开后，等待2秒自动重连
+	time.Sleep(2 * time.Second)
+	command()
 }
 
 // register 节点注册函数
@@ -187,7 +155,7 @@ func register() (err error) {
 		return
 	}
 
-	// 获取节点系统信息（操作系统版本、内核等）
+	// 获取节点系统信息（操作系统版本、内核版本等）
 	systemInfo, err := info.GetSystemInfo()
 	if err != nil {
 		return
@@ -211,11 +179,11 @@ func register() (err error) {
 
 	// 构建节点注册请求
 	req := node_rpc.RegisterRequest{
-		Ip:      _ip,
-		Mac:     mac,
+		Ip:      _ip,                      // 节点IP地址
+		Mac:     mac,                      // 节点MAC地址
 		NodeUid: global.Config.System.Uid, // 节点唯一标识
 		Version: global.Version,           // 节点程序版本
-		Commit:  global.Commit,            // 代码提交哈希
+		Commit:  global.Commit,            // 节点提交哈希
 		SystemInfo: &node_rpc.SystemInfoMessage{
 			HostName:            hostname,                // 主机名
 			DistributionVersion: systemInfo.OSVersion,    // 操作系统版本

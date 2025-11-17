@@ -1,7 +1,7 @@
 package grpc_service
 
-// File: command_stream.go
-// Description: 实现grpc双向流命令服务，负责处理节点与管理服务之间的命令交互，通过通道实现命令的发送与响应接收
+// File: service/grpc_service/command.go
+// Description: 管理节点与服务端的grpc双向流命令交互，通过节点ID映射命令通道，实现多节点的命令发送与响应接收
 
 import (
 	"errors"
@@ -13,60 +13,75 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-// CmdRequestChan 命令请求通道
-// 用于传递需要发送给节点的命令请求，由API层写入，grpc流服务读取并发送到节点
-var CmdRequestChan = make(chan *node_rpc.CmdRequest, 100)
+// Command 节点命令交互结构体
+// 用于管理单个节点的命令请求、响应通道及grpc流连接
+type Command struct {
+	ReqChan chan *node_rpc.CmdRequest          // 命令请求通道，用于接收需要发送给节点的命令
+	ResChan chan *node_rpc.CmdResponse         // 命令响应通道，用于缓存节点返回的命令执行结果
+	Server  node_rpc.NodeService_CommandServer // 节点对应的grpc流服务实例
+}
 
-// CmdResponseChan 命令响应通道
-// 用于传递节点返回的命令执行结果，由grpc流服务接收并写入，API层读取并返回给前端
-var CmdResponseChan = make(chan *node_rpc.CmdResponse, 100)
+// NodeCommandMap 节点命令映射表
+// 键为节点ID，值为对应节点的Command实例，用于管理多个节点的命令流交互
+var NodeCommandMap = map[string]*Command{}
 
-// StreamMap 节点流映射表
-var StreamMap = map[string]node_rpc.NodeService_CommandServer{}
-
-// Command 实现grpc的双向流命令接口
+// Command 实现grpc的双向流命令接口，支持多节点并发命令交互
+// 功能：通过metadata获取节点ID，创建并存储节点对应的命令通道，启动协程发送命令，
 func (NodeService) Command(stream node_rpc.NodeService_CommandServer) error {
+	// 从上下文获取元数据（包含节点ID）
 	ctx := stream.Context()
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return nil
+		return nil // 元数据获取失败，直接返回
 	}
+
+	// 从元数据中提取节点ID
 	nodeIDList := md.Get("nodeID")
 	if len(nodeIDList) == 0 {
-		return errors.New("请在metadata中传入节点id")
+		return errors.New("请在metadata中传入节点id") // 节点ID不存在，返回错误
 	}
 	nodeID := nodeIDList[0]
 
-	// 记录节点上线
-	StreamMap[nodeID] = stream
+	// 为当前节点创建Command实例并存储到映射表
+	NodeCommandMap[nodeID] = &Command{
+		ReqChan: make(chan *node_rpc.CmdRequest),
+		ResChan: make(chan *node_rpc.CmdResponse),
+		Server:  stream,
+	}
 
-	// 启动goroutine接收节点发送的命令响应
+	// 启动协程：从请求通道读取命令并发送到节点
 	go func() {
-		for request := range CmdRequestChan {
-			err := StreamMap[nodeID].Send(request)
+		for request := range NodeCommandMap[nodeID].ReqChan {
+			err := NodeCommandMap[nodeID].Server.Send(request)
 			if err != nil {
-				logrus.Infof("数据发送失败 %s", err)
+				logrus.Infof("向节点[%s]发送命令失败 %s", nodeID, err)
 				continue
 			}
 		}
 	}()
 
+	// 循环接收节点发送的命令响应
 	for {
-		response, err := StreamMap[nodeID].Recv()
+		response, err := NodeCommandMap[nodeID].Server.Recv()
 		if err == io.EOF {
-			logrus.Infof("节点断开")
+			// 流结束（节点断开连接）
+			logrus.Infof("节点[%s]断开连接", nodeID)
 			break
 		}
 		if err != nil {
-			logrus.Infof("节点出错 %s", err)
+			// 接收响应出错
+			logrus.Infof("接收节点[%s]响应出错 %s", nodeID, err)
 			break
 		}
-		// 节点往管理发的，命令的执行结果
-		fmt.Println("命令结果", response)
-		CmdResponseChan <- response
+
+		// 打印命令执行结果（调试用）
+		fmt.Printf("节点[%s]命令结果: %v\n", nodeID, response)
+
+		// 将响应发送到当前节点的响应通道
+		NodeCommandMap[nodeID].ResChan <- response
 	}
 
-	delete(StreamMap, nodeID)
-
+	// 节点断开后，从映射表中删除该节点的Command实例
+	delete(NodeCommandMap, nodeID)
 	return nil
 }
