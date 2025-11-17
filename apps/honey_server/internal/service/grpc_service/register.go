@@ -6,7 +6,6 @@ package grpc_service
 import (
 	"context"
 	"errors"
-	"fmt"
 	"honey_server/internal/global"
 	"honey_server/internal/models"
 	"honey_server/internal/rpc/node_rpc"
@@ -60,7 +59,7 @@ func (NodeService) Register(ctx context.Context, request *node_rpc.RegisterReque
 				NodeID:  model.ID,           // 关联的节点ID
 				Network: message.Network,    // 网卡名称
 				IP:      message.Ip,         // 网卡IP地址
-				Mask:    fmt.Sprintf("%d", message.Mask), // 子网掩码长度
+				Mask:    int8(message.Mask), // 子网掩码
 				Status:  2,                  // 网卡状态（2表示未启用）
 			})
 		}

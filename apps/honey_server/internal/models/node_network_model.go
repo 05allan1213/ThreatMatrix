@@ -10,7 +10,7 @@ type NodeNetworkModel struct {
 	NodeModel NodeModel `gorm:"foreignKey:NodeID" json:"-"` // 关联的节点模型
 	Network   string    `gorm:"size:32" json:"network"`     // 网卡名称
 	IP        string    `gorm:"size:32" json:"ip"`          // 探针IP
-	Mask      string    `gorm:"size:32" json:"mask"`        // 子网掩码 8-32
+	Mask      int8      `gorm:"size:32" json:"mask"`        // 子网掩码 8-32
 	Gateway   string    `gorm:"size:32" json:"gateway"`     // 网关
 	Status    int8      `json:"status"`                     // 网关状态 1 启用 2 未启用
 }
