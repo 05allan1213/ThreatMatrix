@@ -12,12 +12,15 @@ import (
 	"honey_server/internal/rpc/node_rpc"
 	"honey_server/internal/service/grpc_service"
 	"honey_server/internal/utils/res"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
+
+var mutex sync.Mutex
 
 // ScanView 处理网络扫描任务的请求
 // 发起扫描命令到节点，立即返回任务状态，异步处理扫描结果并更新数据库
@@ -38,12 +41,17 @@ func (NetApi) ScanView(c *gin.Context) {
 		return
 	}
 
-	// 通过节点唯一标识（Uid）获取节点命令通道（用于发送GRPC命令和接收响应）
+	// 通过节点唯一标识（Uid）获取节点命令通道（用于发送grpc命令和接收响应）
 	cmd, ok := grpc_service.GetNodeCommand(model.NodeModel.Uid)
 	if !ok {
 		res.FailWithMsg("节点离线中", c)
 		return
 	}
+
+	// 过滤诱捕ip
+	var filterIPList []string
+	global.DB.Model(models.HoneyIpModel{}).Where("net_id = ?", cr.Id).Select("ip").Scan(&filterIPList)
+	fmt.Println("过滤的ip列表", filterIPList)
 
 	// 生成唯一任务ID（基于当前时间戳的纳秒级）
 	taskID := fmt.Sprintf("netScan-%d", time.Now().UnixNano())
@@ -54,10 +62,21 @@ func (NetApi) ScanView(c *gin.Context) {
 		NetScanInMessage: &node_rpc.NetScanInMessage{
 			Network:      model.Network,            // 目标网络接口
 			IpRange:      model.CanUseHoneyIPRange, // 扫描的IP范围
-			FilterIPList: []string{},               // 过滤IP列表
+			FilterIPList: filterIPList,             // 过滤IP列表
 			NetID:        uint32(model.ID),         // 网络ID
 		},
 	}
+
+	mutex.Lock()
+	if model.ScanStatus == 2 {
+		res.FailWithMsg("当前子网正在扫描中", c)
+		mutex.Unlock()
+		return
+	}
+
+	// 修改状态 为扫描中
+	global.DB.Model(&model).Update("scan_status", 2)
+	mutex.Unlock()
 
 	// 发送扫描请求到节点的命令通道（非阻塞发送，避免通道繁忙时阻塞）
 	select {
@@ -79,6 +98,10 @@ func (NetApi) ScanView(c *gin.Context) {
 		// 为异步处理创建独立上下文，设置5分钟超时（适应长时间扫描）
 		ctxAsync, cancelAsync := context.WithTimeout(context.Background(), 5*time.Minute)
 		defer cancelAsync()
+		defer func() {
+			// 扫描任务完成，更新数据库中的扫描状态为扫描完成
+			global.DB.Model(&netModel).Update("scan_status", 1)
+		}()
 
 		// 收集扫描过程中的有效结果
 		var netScanMsg []*node_rpc.NetScanOutMessage
