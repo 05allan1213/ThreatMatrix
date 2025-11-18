@@ -21,6 +21,7 @@ import (
 )
 
 var mutex sync.Mutex
+var netProgressMap sync.Map
 
 // ScanView 处理网络扫描任务的请求
 // 发起扫描命令到节点，立即返回任务状态，异步处理扫描结果并更新数据库
@@ -98,10 +99,6 @@ func (NetApi) ScanView(c *gin.Context) {
 		// 为异步处理创建独立上下文，设置5分钟超时（适应长时间扫描）
 		ctxAsync, cancelAsync := context.WithTimeout(context.Background(), 5*time.Minute)
 		defer cancelAsync()
-		defer func() {
-			// 扫描任务完成，更新数据库中的扫描状态为扫描完成
-			global.DB.Model(&netModel).Update("scan_status", 1)
-		}()
 
 		// 收集扫描过程中的有效结果
 		var netScanMsg []*node_rpc.NetScanOutMessage
@@ -137,6 +134,8 @@ func (NetApi) ScanView(c *gin.Context) {
 				// 收集包含有效IP的扫描结果
 				if message.Ip != "" {
 					netScanMsg = append(netScanMsg, message)
+					netProgressMap.Store(uint(message.NetID), float64(message.Progress))
+					fmt.Printf("网络扫描 %s %s %s %.2f\n", message.Ip, message.Mac, message.Manuf, message.Progress)
 				}
 
 			case <-ctxAsync.Done():
@@ -158,6 +157,15 @@ func (NetApi) ScanView(c *gin.Context) {
 
 // processScanResult 处理扫描结果，对比数据库中已有的主机信息，更新新增、变更和删除的主机记录
 func processScanResult(netModel models.NetModel, scanMsgs []*node_rpc.NetScanOutMessage) {
+	// 在函数执行完毕后，将扫描状态更新为完成，并从进度映射中删除该网络
+	defer func() {
+		global.DB.Model(&netModel).Updates(map[string]any{
+			"scan_progress": 100,
+			"scan_status":   1,
+		})
+		netProgressMap.Delete(netModel.ID)
+	}()
+
 	// 查询当前网络下的所有主机信息
 	var hostList []models.HostModel
 	if err := global.DB.Find(&hostList, "net_id = ?", netModel.ID).Error; err != nil {

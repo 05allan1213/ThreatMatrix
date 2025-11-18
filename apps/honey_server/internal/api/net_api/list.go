@@ -41,6 +41,11 @@ func (NetApi) ListView(c *gin.Context) {
 	// 将查询到的网络列表转换为响应格式（补充节点名称和状态）
 	var list = make([]ListResponse, 0)
 	for _, model := range _list {
+		_progress, ok := netProgressMap.Load(model.ID)
+		if ok {
+			progress := _progress.(float64)
+			model.ScanProgress = progress
+		}
 		list = append(list, ListResponse{
 			NetModel:   model,                  // 网络基础信息
 			NodeTitle:  model.NodeModel.Title,  // 从关联的节点信息中获取节点名称
