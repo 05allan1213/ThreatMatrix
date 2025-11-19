@@ -11,7 +11,7 @@ import (
 // 节点模型
 type NodeModel struct {
 	Model
-	Title        string         `gorm:"size:32" json:"title"`              // 节点名称
+	Title        string         `gorm:"size:64" json:"title"`              // 节点名称
 	Uid          string         `gorm:"size:64" json:"uid"`                // 节点UID
 	IP           string         `gorm:"size:32" json:"ip"`                 // 节点IP
 	Mac          string         `gorm:"size:64" json:"mac"`                // 节点MAC

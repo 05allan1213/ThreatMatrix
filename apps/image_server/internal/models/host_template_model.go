@@ -6,7 +6,7 @@ package models
 // 主机模板表
 type HostTemplateModel struct {
 	Model
-	Title    string               `gorm:"size:32" json:"title"`            // 主机名称
+	Title    string               `gorm:"size:64" json:"title"`            // 主机名称
 	PortList HostTemplatePortList `gorm:"serializer:json" json:"portList"` // 主机端口列表
 }
 
