@@ -5,6 +5,7 @@ package ip
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"net"
 	"strconv"
@@ -189,4 +190,61 @@ func BroadcastIP(network *net.IPNet) net.IP {
 // FormatIPRange 格式化IP范围为字符串
 func FormatIPRange(start, end net.IP) string {
 	return fmt.Sprintf("%s-%s", start, end)
+}
+
+// ipToInt 将IPv4地址转换为整数
+func ipToInt(ip net.IP) uint32 {
+	ip4 := ip.To4()
+	return (uint32(ip4[0]) << 24) | (uint32(ip4[1]) << 16) | (uint32(ip4[2]) << 8) | uint32(ip4[3])
+}
+
+// intToIP 将整数转换为IPv4地址
+func intToIP(ipInt uint32) string {
+	return fmt.Sprintf("%d.%d.%d.%d",
+		(ipInt>>24)&0xff,
+		(ipInt>>16)&0xff,
+		(ipInt>>8)&0xff,
+		ipInt&0xff)
+}
+
+func ParseCIDRGetUseIPRange(cidr string) (r string, err error) {
+	ipObj, ipNet, err := net.ParseCIDR(cidr)
+	if err != nil {
+		err = errors.New("无效的网段")
+		return
+	}
+	mask, _ := ipNet.Mask.Size()
+	// 转换为IPv4地址
+	ip4 := ipObj.To4()
+	if ip4 == nil {
+		err = errors.New("不是有效的IPv4地址")
+		return
+	}
+
+	// 处理掩码小于24的情况，取第一个C段
+	if mask < 24 {
+		ipParts := strings.Split(ip4.String(), ".")
+		if len(ipParts) != 4 {
+			err = errors.New("无效的IPv4地址格式")
+			return
+		}
+		// 构建第一个C段地址
+		firstC := fmt.Sprintf("%s.%s.%s.0", ipParts[0], ipParts[1], ipParts[2])
+		ip4 = net.ParseIP(firstC).To4()
+		mask = 24
+	}
+
+	// 计算网络地址和广播地址
+	ipInt := ipToInt(ip4)
+	maskBits := uint(32 - mask)
+	networkInt := ipInt & (^uint32(0) << maskBits)
+	broadcastInt := networkInt | (^uint32(0) >> (32 - maskBits))
+
+	// 计算可用IP范围
+	firstUsable := networkInt + 1
+	lastUsable := broadcastInt - 1
+
+	// 输出结果
+	r = fmt.Sprintf("%s-%s", intToIP(firstUsable), intToIP(lastUsable))
+	return
 }
