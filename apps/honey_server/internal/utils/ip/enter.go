@@ -108,3 +108,85 @@ func ParseIPRange(ipRange string) ([]string, error) {
 
 	return result, nil
 }
+
+// IncrementIP 将IP地址加1
+func IncrementIP(ip net.IP) net.IP {
+	if ip == nil {
+		return nil
+	}
+
+	// 复制IP地址，避免修改原IP
+	newIP := make(net.IP, len(ip))
+	copy(newIP, ip)
+
+	// 处理IPv4地址
+	if ip4 := newIP.To4(); ip4 != nil {
+		for i := 3; i >= 0; i-- {
+			newIP[i]++
+			if newIP[i] > 0 {
+				break
+			}
+		}
+		return newIP
+	}
+
+	// 处理IPv6地址
+	for i := len(newIP) - 1; i >= 0; i-- {
+		newIP[i]++
+		if newIP[i] > 0 {
+			break
+		}
+	}
+	return newIP
+}
+
+// DecrementIP 将IP地址减1
+func DecrementIP(ip net.IP) net.IP {
+	if ip == nil {
+		return nil
+	}
+
+	newIP := make(net.IP, len(ip))
+	copy(newIP, ip)
+
+	if ip4 := newIP.To4(); ip4 != nil {
+		for i := 3; i >= 0; i-- {
+			newIP[i]--
+			if newIP[i] < 255 {
+				break
+			}
+		}
+		return newIP
+	}
+
+	for i := len(newIP) - 1; i >= 0; i-- {
+		newIP[i]--
+		if newIP[i] < 255 {
+			break
+		}
+	}
+	return newIP
+}
+
+// BroadcastIP 计算CIDR块的广播地址
+func BroadcastIP(network *net.IPNet) net.IP {
+	ip := network.IP.To4()
+	if ip == nil {
+		// 处理IPv6广播地址 (实际上IPv6没有广播地址)
+		return nil
+	}
+
+	mask := network.Mask
+	result := make(net.IP, len(ip))
+
+	for i := 0; i < len(ip); i++ {
+		result[i] = ip[i] | ^mask[i]
+	}
+
+	return result
+}
+
+// FormatIPRange 格式化IP范围为字符串
+func FormatIPRange(start, end net.IP) string {
+	return fmt.Sprintf("%s-%s", start, end)
+}

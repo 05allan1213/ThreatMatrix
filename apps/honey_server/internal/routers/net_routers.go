@@ -32,4 +32,7 @@ func NetRouters(r *gin.RouterGroup) {
 
 	// 网络扫描（POST），绑定 JSON 参数
 	r.POST("net/scan", middleware.BindJsonMiddleware[models.IDRequest], app.ScanView)
+
+	// 网络使用 IP 列表（GET），绑定 Query 参数
+	r.GET("net/ip_list", middleware.BindQueryMiddleware[models.IDRequest], app.NetUseIPListView)
 }
