@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -52,6 +53,10 @@ func (model NetModel) BeforeDelete(tx *gorm.DB) error {
 	if err != nil {
 		return nil
 	}
+	// 删除关联的主机
+	var hostList []HostModel
+	tx.Find(&hostList, "net_id = ?", model.ID).Delete(&hostList)
+	logrus.Infof("关联删除主机 %d个", len(hostList))
 	// 修改状态
 	tx.Model(&nodeNet).Update("status", 2)
 	return nil
