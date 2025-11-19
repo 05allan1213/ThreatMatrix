@@ -10,6 +10,7 @@ import (
 	"honey_server/internal/utils/ip"
 	"honey_server/internal/utils/res"
 	"net"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,12 +21,20 @@ type NetUseIPListResponse struct {
 	Used               int      `json:"used"`               // 已使用IP数
 	UseIPList          []string `json:"useIPList"`          // 可用IP列表
 	CanUseHoneyIPRange string   `json:"canUseHoneyIPRange"` // 能够使用的诱捕ip范围
+	CurrentPage        int      `json:"currentPage"`        // 当前页码
+	TotalPages         int      `json:"totalPages"`         // 总页数
+}
+
+// NetUseIPListRequest IP使用列表请求结构体
+type NetUseIPListRequest struct {
+	models.IDRequest
+	models.PageInfo
 }
 
 // NetUseIPListView 查询网络IP使用情况的接口处理函数
 func (NetApi) NetUseIPListView(c *gin.Context) {
-	// 从请求中绑定并获取ID参数（models.IDRequest结构体）
-	cr := middleware.GetBind[models.IDRequest](c)
+	// 从请求中绑定并获取ID参数
+	cr := middleware.GetBind[NetUseIPListRequest](c)
 
 	var model models.NetModel
 	// 根据ID从数据库查询网络信息
@@ -53,7 +62,7 @@ func (NetApi) NetUseIPListView(c *gin.Context) {
 	// 解析可使用的IP范围为具体的IP列表
 	ipList, err := ip.ParseIPRange(model.CanUseHoneyIPRange)
 	if err != nil {
-		res.FailWithMsg("无效的IP范围", c)
+		res.FailWithMsg("解析IP范围失败", c)
 		return
 	}
 
@@ -79,11 +88,46 @@ func (NetApi) NetUseIPListView(c *gin.Context) {
 		}
 	}
 
+	// 应用前缀匹配
+	if cr.Key != "" {
+		var filteredIPs []string
+		for _, ip := range availableIPs {
+			if strings.HasPrefix(ip, cr.Key) {
+				filteredIPs = append(filteredIPs, ip)
+			}
+		}
+		availableIPs = filteredIPs
+	}
+
+	// 设置默认分页参数
+	if cr.Page <= 0 {
+		cr.Page = 1
+	}
+	if cr.Limit <= 0 || cr.Limit > 254 {
+		cr.Limit = 254
+	}
+
+	// 计算分页
+	startIndex := (cr.Page - 1) * cr.Limit
+	endIndex := startIndex + cr.Limit
+	if startIndex > len(availableIPs) {
+		startIndex = len(availableIPs)
+	}
+	if endIndex > len(availableIPs) {
+		endIndex = len(availableIPs)
+	}
+	paginatedIPs := availableIPs[startIndex:endIndex]
+
+	// 计算总页数
+	totalPages := (len(availableIPs) + cr.Limit - 1) / cr.Limit
+
 	// 组装响应数据并返回成功结果
 	res.OkWithData(NetUseIPListResponse{
 		Total:              len(ipList),
 		Used:               len(ipList) - len(availableIPs),
-		UseIPList:          availableIPs,
+		UseIPList:          paginatedIPs,
 		CanUseHoneyIPRange: model.CanUseHoneyIPRange,
+		CurrentPage:        cr.Page,
+		TotalPages:         totalPages,
 	}, c)
 }
