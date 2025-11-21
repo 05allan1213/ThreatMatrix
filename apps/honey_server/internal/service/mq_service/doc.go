@@ -1,2 +1,2 @@
-// Package mq_service 提供队列服务
+// Package mq_service 消息队列管理端服务模块
 package mq_service

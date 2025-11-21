@@ -6,7 +6,7 @@ package core
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"honey_server/internal/global"
+	"honey_node/internal/global"
 	"os"
 
 	"github.com/sirupsen/logrus"

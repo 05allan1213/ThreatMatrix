@@ -8,6 +8,7 @@ import (
 	"honey_node/internal/rpc/node_rpc"
 
 	"github.com/sirupsen/logrus"
+	"github.com/streadway/amqp"
 )
 
 var (
@@ -20,4 +21,5 @@ var (
 	Config     *config.Config             // 配置实例
 	Log        *logrus.Entry              // 日志实例
 	GrpcClient node_rpc.NodeServiceClient // RPC客户端实例
+	Queue      *amqp.Channel              // rabbitMQ消息队列实例
 )

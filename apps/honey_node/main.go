@@ -8,6 +8,7 @@ import (
 	"honey_node/internal/global"
 	"honey_node/internal/service/command"
 	"honey_node/internal/service/cron_service"
+	"honey_node/internal/service/mq_service"
 
 	"github.com/sirupsen/logrus"
 )
@@ -35,11 +36,17 @@ func main() {
 		return
 	}
 
+	// 初始化rabbitMQ消息队列
+	global.Queue = core.InitMQ()
+
 	// 启动命令处理机制（建立与服务器的双向流连接，处理命令收发及自动重连）
 	nodeClient.StartCommandHandling()
 
 	// 启动定时任务
 	cron_service.Run()
+
+	// 启动消息队列服务
+	mq_service.Run()
 
 	// 阻塞主goroutine（防止程序退出，保持所有后台协程运行）
 	select {}
