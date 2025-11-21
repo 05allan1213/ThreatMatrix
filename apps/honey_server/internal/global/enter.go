@@ -8,6 +8,7 @@ import (
 
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
+	"github.com/streadway/amqp"
 	"gorm.io/gorm"
 )
 
@@ -22,4 +23,5 @@ var (
 	Config *config.Config // 配置实例
 	Log    *logrus.Entry  // 日志实例
 	Redis  *redis.Client  // Redis 客户端实例
+	Queue  *amqp.Channel  // rabbitMQ 实例
 )

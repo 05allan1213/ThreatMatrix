@@ -32,3 +32,16 @@ whiteList:
   - /honey_server/internal/login # 登录接口
   - /honey_server/internal/captcha # 验证码接口
   - /honey_server/internal/site # 站点信息接口
+
+mq:
+  user: admin # 用户名
+  password: password # 密码
+  host: 82.157.155.26 # RabbitMQ地址
+  port: 5672 # RabbitMQ端口 
+  createIpExchangeName: createIpExchange # 创建IP的交换机名称
+  deleteIpExchangeName: deleteIpExchangeName # 删除IP的交换机名称
+  bindPortExchangeName: bindPortExchangeName # 绑定端口的交换机名称
+  ssl: false # 是否使用SSL
+  clientCertificate: # 客户端的证书
+  clientKey:  # 客户端的私钥
+  caCertificate:  # ca的证书
