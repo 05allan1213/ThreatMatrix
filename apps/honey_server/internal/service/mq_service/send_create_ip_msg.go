@@ -1,6 +1,6 @@
 package mq_service
 
-// File: service/mq_service/send_msg.go
+// File: service/mq_service/send_create_ip_msg.go
 // Description: 负责构建并发送创建IP相关的消息到RabbitMQ，处理消息序列化及发布逻辑
 
 import (
