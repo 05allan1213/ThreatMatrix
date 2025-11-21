@@ -102,9 +102,8 @@ var manufDB *OUIDatabase // 全局的OUI数据库实例
 // init 初始化函数：创建并加载全局OUI数据库
 func init() {
 	manufDB = NewOUIDatabase()
-	var err error
 	// 从嵌入式的oui数据创建读取器，并加载到数据库
-	err = manufDB.LoadFromIEEE(bufio.NewReader(bytes.NewReader(oui)))
+	err := manufDB.LoadFromIEEE(bufio.NewReader(bytes.NewReader(oui)))
 	if err != nil {
 		logrus.Fatalf("加载OUI数据库失败: %v", err)
 		return

@@ -40,7 +40,7 @@ func register(exChangeName string, fun func(msg string) error) {
 	cf := global.Config
 	// 声明队列（每个节点唯一队列，避免消息重复消费）
 	queue, err := global.Queue.QueueDeclare(
-		fmt.Sprintf("exChangeName_%s_queue", cf.System.Uid), // 队列名称：结合系统UID保证唯一性
+		fmt.Sprintf("%s_%s_queue", exChangeName, cf.System.Uid), // 队列名称：结合系统UID保证唯一性
 		true,  // 持久化队列：队列重启后不丢失
 		false, // 自动删除：否
 		false, // 排他性：否（允许其他连接访问）
@@ -75,6 +75,8 @@ func register(exChangeName string, fun func(msg string) error) {
 	)
 	if err != nil {
 		logrus.Fatalf("注册消费者失败 %s", err)
+	} else {
+		logrus.Infof("绑定交换器成功 %s", exChangeName)
 	}
 
 	// 循环消费队列中的消息

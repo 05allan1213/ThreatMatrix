@@ -8,6 +8,7 @@ import (
 	"honey_server/internal/middleware"
 	"honey_server/internal/models"
 	"honey_server/internal/service/grpc_service"
+	"honey_server/internal/service/mq_service"
 	"honey_server/internal/utils"
 	"honey_server/internal/utils/res"
 
@@ -85,6 +86,14 @@ func (HoneyIPApi) CreateView(c *gin.Context) {
 		res.FailWithMsg("创建诱捕ip失败", c)
 		return
 	}
+
+	// 发送创建IP消息给节点
+	mq_service.SendCreateIPMsg(netModel.NodeModel.Uid, mq_service.CreateIPRequest{
+		HoneyIPID: model.ID,
+		IP:        model.IP,
+		Mask:      netModel.Mask,
+		Network:   netModel.Network,
+	})
 
 	// 创建成功，返回诱捕IP记录ID
 	res.OkWithData(model.ID, c)

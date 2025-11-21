@@ -54,5 +54,5 @@ func Resource() {
 	}
 
 	// 上报成功，记录信息日志
-	logrus.Infof("节点资源信息上报成功 %v", req)
+	// logrus.Infof("节点资源信息上报成功 %v", req)
 }
