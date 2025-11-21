@@ -35,6 +35,10 @@ func (HoneyIPApi) CreateView(c *gin.Context) {
 
 	// 合法性校验2：判断IP是否在网络的可用IP范围内
 	ipRange, err := netModel.IpRange()
+	if err != nil {
+		res.FailWithMsg("网络未配置可用ip范围", c)
+		return
+	}
 	if !utils.InList(ipRange, cr.IP) {
 		res.FailWithMsg("当前ip不存在可部署ip列表里面", c)
 		return

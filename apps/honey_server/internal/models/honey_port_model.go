@@ -13,6 +13,7 @@ type HoneyPortModel struct {
 	HoneyIpID    uint         `json:"honeyIpID"`                     // 诱捕IP ID
 	HoneyIpModel HoneyIpModel `gorm:"foreignKey:HoneyIpID" json:"-"` // 关联诱捕IP
 	ServiceID    uint         `json:"serviceID"`                     // 服务ID
+	ServiceModel ServiceModel `gorm:"foreignKey:ServiceID" json:"-"` // 关联服务
 	Port         int          `json:"port"`                          // 服务的端口
 	DstIP        string       `gorm:"size:32" json:"dstIP"`          // 目标IP
 	DstPort      int          `json:"dstPort"`                       // 目标端口
