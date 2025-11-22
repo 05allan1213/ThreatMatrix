@@ -10,6 +10,7 @@ import (
 	"honey_node/internal/service/command"
 	"honey_node/internal/service/cron_service"
 	"honey_node/internal/service/mq_service"
+	"honey_node/internal/service/port_service"
 
 	"github.com/sirupsen/logrus"
 )
@@ -52,6 +53,8 @@ func main() {
 	cron_service.Run()
 	// 启动消息队列消费服务：消费RabbitMQ中的任务消息
 	mq_service.Run()
+	// 加载端口转发信息
+	port_service.LoadTunnel()
 
 	// 阻塞主线程，保持程序运行（避免main函数退出）
 	select {}

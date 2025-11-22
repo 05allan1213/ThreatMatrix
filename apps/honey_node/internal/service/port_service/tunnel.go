@@ -6,6 +6,7 @@ package port_service
 import (
 	"context"
 	"honey_node/internal/global"
+	"honey_node/internal/models"
 	"honey_node/internal/rpc/node_rpc"
 	"io"
 	"net"
@@ -47,6 +48,28 @@ func Tunnel(localAddr, targetAddr string) (err error) {
 		go handleConnection(global.GrpcClient, clientConn, targetAddr)
 	}
 	return nil
+}
+
+// CloseIpTunnel 关闭指定IP上的所有隧道监听服务
+func CloseIpTunnel(ip string) {
+	// 遍历所有已存储的隧道连接
+	tunnelStore.Range(func(key, value any) bool {
+		localAddr := key.(string)
+		// 检查当前隧道是否属于指定的IP地址
+		if strings.HasPrefix(localAddr, ip) {
+			// 从数据库中查找并删除对应端口模型记录
+			var model models.PortModel
+			global.DB.Find(&model, "local_addr = ?", localAddr)
+			if model.ID != 0 {
+				global.DB.Delete(&model)
+			}
+			// 记录日志并关闭监听器
+			logrus.Infof("清除%s上的全部服务", ip)
+			listener := value.(net.Listener)
+			listener.Close()
+		}
+		return true
+	})
 }
 
 // handleConnection 处理单个TCP连接的gRPC隧道转发
@@ -124,17 +147,4 @@ func handleConnection(client node_rpc.NodeServiceClient, localConn net.Conn, tar
 
 	// 主动关闭gRPC流的发送端：告知服务端本地数据发送完成，触发服务端的流关闭逻辑
 	stream.CloseSend()
-}
-
-// CloseIpTunnel 关闭指定IP的TCP监听
-func CloseIpTunnel(ip string) {
-	tunnelStore.Range(func(key, value any) bool {
-		localAddr := key.(string)
-		if strings.HasPrefix(localAddr, ip) {
-			logrus.Infof("清除%s上的全部服务", ip)
-			listener := value.(net.Listener)
-			listener.Close()
-		}
-		return true
-	})
 }

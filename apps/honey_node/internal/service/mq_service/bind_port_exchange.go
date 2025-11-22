@@ -6,6 +6,8 @@ package mq_service
 import (
 	"encoding/json"
 	"fmt"
+	"honey_node/internal/global"
+	"honey_node/internal/models"
 	"honey_node/internal/service/port_service"
 
 	"github.com/sirupsen/logrus"
@@ -56,6 +58,10 @@ func BindPortExChange(msg string) error {
 
 	// 遍历端口转发配置列表，为每个端口启动独立的转发服务
 	for _, port := range req.PortList {
+		global.DB.Create(&models.PortModel{
+			TargetAddr: port.TargetAddr(),
+			LocalAddr:  port.LocalAddr(),
+		})
 		// 使用goroutine异步启动每个端口的转发，避免阻塞消息处理
 		go func(port PortInfo) {
 			// 调用port_service的Tunnel方法，建立本地端口到目标地址的TCP转发隧道
