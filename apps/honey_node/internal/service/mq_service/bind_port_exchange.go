@@ -51,13 +51,18 @@ func BindPortExChange(msg string) error {
 		return nil // 解析失败返回nil，避免消息重复处理
 	}
 
+	// 把这个IP上的服务全部停掉
+	port_service.CloseIpTunnel(req.IP)
+
 	// 遍历端口转发配置列表，为每个端口启动独立的转发服务
 	for _, port := range req.PortList {
 		// 使用goroutine异步启动每个端口的转发，避免阻塞消息处理
 		go func(port PortInfo) {
 			// 调用port_service的Tunnel方法，建立本地端口到目标地址的TCP转发隧道
 			err := port_service.Tunnel(port.LocalAddr(), port.TargetAddr())
-			fmt.Println(err)
+			if err != nil {
+				logrus.Errorf("端口绑定失败 %s", err)
+			}
 		}(port)
 	}
 

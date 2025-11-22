@@ -9,9 +9,13 @@ import (
 	"honey_node/internal/rpc/node_rpc"
 	"io"
 	"net"
+	"strings"
+	"sync"
 
 	"github.com/sirupsen/logrus"
 )
+
+var tunnelStore = sync.Map{}
 
 // Tunnel 启动本地TCP端口监听并建立gRPC隧道转发
 // 实现本地端口到目标地址的TCP数据透传，支撑诱捕端口的代理功能
@@ -20,24 +24,29 @@ func Tunnel(localAddr, targetAddr string) (err error) {
 	listener, err := net.Listen("tcp", localAddr)
 	if err != nil {
 		logrus.Errorf("创建本地监听失败: %v", err)
-		return err // 返回监听创建失败的错误
+		return
 	}
-	defer listener.Close() // 函数退出时关闭监听，释放端口资源
 
 	logrus.Infof("本地监听启动，地址: %s", localAddr)
 	logrus.Infof("目标地址: %s", targetAddr)
+
+	tunnelStore.Store(localAddr, listener)
 
 	// 循环接受客户端连接：持续监听端口，处理新的TCP连接请求
 	for {
 		clientConn, err := listener.Accept()
 		if err != nil {
+			if strings.Contains(err.Error(), "closed") {
+				break
+			}
 			logrus.Errorf("接受客户端连接失败: %v", err)
-			continue // 单个连接失败不影响整体监听，继续等待下一个连接
+			break
 		}
 
 		// 异步处理单个连接的转发逻辑：每个连接使用独立goroutine，支持高并发
 		go handleConnection(global.GrpcClient, clientConn, targetAddr)
 	}
+	return nil
 }
 
 // handleConnection 处理单个TCP连接的gRPC隧道转发
@@ -115,4 +124,17 @@ func handleConnection(client node_rpc.NodeServiceClient, localConn net.Conn, tar
 
 	// 主动关闭gRPC流的发送端：告知服务端本地数据发送完成，触发服务端的流关闭逻辑
 	stream.CloseSend()
+}
+
+// CloseIpTunnel 关闭指定IP的TCP监听
+func CloseIpTunnel(ip string) {
+	tunnelStore.Range(func(key, value any) bool {
+		localAddr := key.(string)
+		if strings.HasPrefix(localAddr, ip) {
+			logrus.Infof("清除%s上的全部服务", ip)
+			listener := value.(net.Listener)
+			listener.Close()
+		}
+		return true
+	})
 }
