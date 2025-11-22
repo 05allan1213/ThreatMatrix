@@ -12,6 +12,8 @@ service NodeService {
   rpc NodeResource (NodeResourceRequest) returns (BaseResponse) {}
   // 管理下发命令到节点运行
   rpc Command (stream CmdResponse) returns (stream CmdRequest) {}
+  // 节点上报创建IP的回调
+  rpc StatusCreateIP(StatusCreateIPRequest)returns (BaseResponse) {}
 }
 
 // 定义响应结构体
@@ -132,6 +134,14 @@ message CmdResponse {
   NetworkFlushOutMessage NetworkFlushOutMessage = 6;
   NetScanOutMessage NetScanOutMessage = 7;
   NodeRemoveOutMessage NodeRemoveOutMessage = 8;
+}
+
+// 节点创建IP状态上报请求
+message StatusCreateIPRequest {
+  uint32 honeyIPID = 1;
+  string errMsg = 2;
+  string network = 3;
+  string mac = 4;
 }
 
 // protoc --go_out=. --go-grpc_out=. *.proto
