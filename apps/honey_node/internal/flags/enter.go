@@ -57,6 +57,7 @@ func RegisterCommand() {
 func runBaseCommand() {
 	// 执行数据库迁移
 	if Options.DB {
+		Migrate()
 		os.Exit(0)
 	}
 

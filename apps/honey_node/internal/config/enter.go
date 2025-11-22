@@ -11,6 +11,7 @@ type Config struct {
 	System            System   `yaml:"system"`
 	FilterNetworkList []string `yaml:"filterNetworkList"`
 	MQ                MQ       `yaml:"mq"`
+	DB                DB       `yaml:"db"`
 }
 
 // 日志配置
@@ -59,4 +60,12 @@ func (m MQ) Addr() string {
 		m.Host,
 		m.Port,
 	)
+}
+
+// 数据库配置
+type DB struct {
+	DbName          string `yaml:"db_name"`
+	MaxIdleConns    int    `yaml:"maxIdleConns"`
+	MaxOpenConns    int    `yaml:"maxOpenConns"`
+	ConnMaxLifetime int    `yaml:"connMaxLifetime"`
 }

@@ -1,7 +1,7 @@
 package core
 
 // File: core/db.go
-// Description: 实现数据库初始化，用于建立与数据库的连接及配置连接池。
+// Description: 实现MySQL数据库初始化，用于建立与数据库的连接及配置连接池。
 
 import (
 	"honey_server/internal/global"

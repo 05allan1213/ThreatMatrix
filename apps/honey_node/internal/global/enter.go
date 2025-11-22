@@ -9,6 +9,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
+	"gorm.io/gorm"
 )
 
 var (
@@ -22,4 +23,5 @@ var (
 	Log        *logrus.Entry              // 日志实例
 	GrpcClient node_rpc.NodeServiceClient // RPC客户端实例
 	Queue      *amqp.Channel              // rabbitMQ消息队列实例
+	DB         *gorm.DB                   // 数据库实例
 )

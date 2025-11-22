@@ -5,6 +5,7 @@ package main
 
 import (
 	"honey_node/internal/core"
+	"honey_node/internal/flags"
 	"honey_node/internal/global"
 	"honey_node/internal/service/command"
 	"honey_node/internal/service/cron_service"
@@ -23,6 +24,8 @@ func main() {
 	core.SetLogDefault()
 	// 获取全局日志实例：供全系统使用统一的日志接口
 	global.Log = core.GetLogger()
+	// 获取数据库连接实例：用于SQLite数据库操作
+	global.DB = core.GetDB()
 
 	// 创建gRPC客户端：建立与服务端的gRPC连接，用于后续通信
 	global.GrpcClient = core.GetGrpcClient()
@@ -35,6 +38,9 @@ func main() {
 		logrus.Fatalf("节点注册失败: %v", err)
 		return
 	}
+
+	// 启动命令行参数处理服务：解析命令行参数，并执行相应的操作
+	flags.Run()
 
 	// 初始化消息队列：建立与RabbitMQ的连接，用于消费服务端下发的任务消息
 	global.Queue = core.InitMQ()

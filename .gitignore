@@ -67,6 +67,7 @@ coverage.out
 *.local
 *.cache
 *.tar.gz
+*.db
 
 # -----------------------------
 # 7. Docker / 部署相关
