@@ -23,6 +23,9 @@ func RunContainer(containerName, networkName, ip, image string) (containerID str
 	hostConfig := &container.HostConfig{
 		AutoRemove:  false,
 		NetworkMode: container.NetworkMode(networkName),
+		RestartPolicy: container.RestartPolicy{
+			Name: "always",
+		},
 	}
 
 	// 网络配置：指定 IP 和网络

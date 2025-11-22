@@ -4,7 +4,7 @@ logger:
   level: info # 日志级别 可选值: debug, info, warn, error, fatal, panic
 
 system:
-  grpcManageAddr: "127.0.0.1:8081" # gRPC管理地址
+  grpcManageAddr: "82.157.155.26:8081" # gRPC管理地址
   network: eth0 # 主网卡名
   uid: 28b603b8-1561-4b6b-914f-09df0b600089
 
@@ -23,11 +23,11 @@ mq:
   user: admin # 用户名
   password: password # 密码 
   host: 82.157.155.26 # RabbitMQ地址
-  port: 5672 # RabbitMQ端口
+  port: 5671 # RabbitMQ端口
   createIpExchangeName: createIpExchange # 创建IP的交换机名称
   deleteIpExchangeName: deleteIpExchangeName # 删除IP的交换机名称
   bindPortExchangeName: bindPortExchangeName # 绑定端口的交换机名称
-  ssl: false # 是否使用SSL
-  clientCertificate: # 客户端的证书
-  clientKey:  # 客户端的私钥
-  caCertificate:  # ca的证书
+  ssl: true
+  clientCertificate: mq_cert/client_certificate.pem # 客户端的证书
+  clientKey:  mq_cert/client_key.pem # 客户端的私钥
+  caCertificate: mq_cert/ca_certificate.pem # ca的证书

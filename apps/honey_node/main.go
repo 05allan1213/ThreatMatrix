@@ -9,6 +9,7 @@ import (
 	"honey_node/internal/global"
 	"honey_node/internal/service/command"
 	"honey_node/internal/service/cron_service"
+	"honey_node/internal/service/ip_service"
 	"honey_node/internal/service/mq_service"
 	"honey_node/internal/service/port_service"
 
@@ -53,6 +54,8 @@ func main() {
 	cron_service.Run()
 	// 启动消息队列消费服务：消费RabbitMQ中的任务消息
 	mq_service.Run()
+	// 加载IP信息
+	ip_service.IPLoad()
 	// 加载端口转发信息
 	port_service.LoadTunnel()
 

@@ -41,16 +41,21 @@ func DeleteIpExChange(msg string) error {
 		"req": req,
 	}).Infof("删除诱捕ip")
 
-	var idList []uint32 // 收集待上报的诱捕IPID列表
+	var idList []uint32       // 收集待上报的诱捕IPID列表
+	var linkNameList []string // 存储删除的接口名称
 	// 遍历IP列表，执行网络接口删除命令
 	for _, info := range req.IpList {
 		// 删除对应的macvlan网络接口（info.Network为接口名称）
 		if !info.IsTan {
 			cmd.Cmd(fmt.Sprintf("ip link del %s", info.Network))
+			linkNameList = append(linkNameList, info.Network)
 		} else {
 			logrus.Infof("这是探针 %v", info)
 		}
 		idList = append(idList, uint32(info.HoneyIPID)) // 收集ID用于状态上报
+	}
+	if len(linkNameList) > 0 {
+		global.DB.Delete(&linkNameList)
 	}
 
 	// 上报批量删除状态到服务端

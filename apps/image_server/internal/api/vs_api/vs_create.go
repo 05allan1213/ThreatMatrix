@@ -155,7 +155,7 @@ func (VsApi) VsCreateView(c *gin.Context) {
 	}(&model)
 
 	// 返回创建成功响应
-	res.OkWithMsg("创建虚拟服务成功", c)
+	res.Ok(model.ID, "创建虚拟服务成功", c)
 }
 
 // ContainerStatus 检测容器运行状态并更新数据库记录
