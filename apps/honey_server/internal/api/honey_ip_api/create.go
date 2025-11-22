@@ -87,12 +87,18 @@ func (HoneyIPApi) CreateView(c *gin.Context) {
 		return
 	}
 
+	var isTan bool
+	if netModel.IP == model.IP {
+		isTan = true
+	}
+
 	// 发送创建IP消息给节点
 	mq_service.SendCreateIPMsg(netModel.NodeModel.Uid, mq_service.CreateIPRequest{
 		HoneyIPID: model.ID,
 		IP:        model.IP,
 		Mask:      netModel.Mask,
 		Network:   netModel.Network,
+		IsTan:     isTan,
 	})
 
 	// 创建成功，返回诱捕IP记录ID

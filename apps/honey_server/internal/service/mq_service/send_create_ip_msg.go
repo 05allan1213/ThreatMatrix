@@ -17,6 +17,7 @@ type CreateIPRequest struct {
 	IP        string `json:"ip"`        // 要创建的IP地址
 	Mask      int8   `json:"mask"`      // 子网掩码位数
 	Network   string `json:"network"`   // 基于哪个网络接口创建
+	IsTan     bool   `json:"isTan"`     // 是否是探针ip
 	LogID     string `json:"logID"`     // 日志ID，用于追踪该任务的日志
 }
 

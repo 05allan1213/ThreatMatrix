@@ -25,6 +25,7 @@ type IpInfo struct {
 	HoneyIPID uint   `json:"honeyIpID"` // 关联的诱捕IP记录ID
 	IP        string `json:"ip"`        // 待删除的IP地址
 	Network   string `json:"network"`   // 对应的macvlan网络接口名称（如hy_12）
+	IsTan     bool   `json:"isTan"`     // 是否是探针ip
 }
 
 // DeleteIpExChange 处理删除诱捕IP的消息消费逻辑
@@ -44,7 +45,11 @@ func DeleteIpExChange(msg string) error {
 	// 遍历IP列表，执行网络接口删除命令
 	for _, info := range req.IpList {
 		// 删除对应的macvlan网络接口（info.Network为接口名称）
-		cmd.Cmd(fmt.Sprintf("ip link del %s", info.Network))
+		if !info.IsTan {
+			cmd.Cmd(fmt.Sprintf("ip link del %s", info.Network))
+		} else {
+			logrus.Infof("这是探针 %v", info)
+		}
 		idList = append(idList, uint32(info.HoneyIPID)) // 收集ID用于状态上报
 	}
 
