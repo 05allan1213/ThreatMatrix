@@ -4,7 +4,7 @@ logger:
   level: info # 日志级别 可选值: debug, info, warn, error, fatal, panic
 
 system:
-  grpcManageAddr: "82.157.155.26:8081" # gRPC管理地址
+  grpcManageAddr: "127.0.0.1:8081" # gRPC管理地址
   network: eth0 # 主网卡名
   uid: 28b603b8-1561-4b6b-914f-09df0b600089
 
