@@ -16,7 +16,7 @@ import (
 // 网络模型
 type NetModel struct {
 	Model
-	NodeID             uint      `json:"nodeID"`                             // 关联的节点ID
+	NodeID             uint      `gorm:"index:idx_node_id" json:"nodeID"`    // 关联的节点ID
 	NodeModel          NodeModel `gorm:"foreignKey:NodeID" json:"-"`         // 关联的节点模型
 	Title              string    `gorm:"size:64" json:"title"`               // 网络名称
 	Network            string    `gorm:"size:32" json:"network"`             // 网卡名称

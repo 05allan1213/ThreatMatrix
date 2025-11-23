@@ -13,7 +13,7 @@ import (
 // 节点网卡模型
 type NodeNetworkModel struct {
 	Model
-	NodeID    uint      `json:"nodeID"`                     // 关联的节点ID
+	NodeID    uint      `gorm:"idx_node_id" json:"nodeID"`  // 关联的节点ID
 	NodeModel NodeModel `gorm:"foreignKey:NodeID" json:"-"` // 关联的节点模型
 	Network   string    `gorm:"size:32" json:"network"`     // 网卡名称
 	IP        string    `gorm:"size:32" json:"ip"`          // 探针IP
