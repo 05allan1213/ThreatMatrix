@@ -14,5 +14,5 @@ type HoneyIpModel struct {
 	Mac       string    `gorm:"size:64" json:"mac"`         // MAC地址
 	Network   string    `gorm:"size:32" json:"network"`     // 网卡
 	Status    int8      `json:"status"`                     // 状态  1 创建中 2 运行中 3 失败 4 删除中
-	ErrorMsg  string    `json:"errorMsg"`                   // 错误信息
+	ErrorMsg  string    `gorm:"size:64" json:"errorMsg"`    // 错误信息
 }
